@@ -8,8 +8,8 @@ install.packages("ggvegan")
 install.packages("RSQlite")
 install.packages("DBI")# also needs RSQLite installed
 install.packages("devtools")
-install.packages("cowplot")
-
+install.packages("patchwork")
+install.packages("osfr")
 
 # Install libraries from GitHub:
 library(devtools)
@@ -17,6 +17,5 @@ remotes::install_github("richardjtelford/ggbiplot")
 remotes::install_github("gavinsimpson/ggvegan")
 remotes::install_github("gustavobio/tpldata")
 remotes::install_github("gustavobio/tpl")
-remotes::install_github("centerforopenscience/osfr")
 devtools::install_github("Between-the-Fjords/dataDownloader")
 
