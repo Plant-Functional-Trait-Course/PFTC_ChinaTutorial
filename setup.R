@@ -1,6 +1,5 @@
 
-# Run this script first to check required packages installed and to download data from OSF
-# Repeating the download occasionally is highly recommended, since the data are regularly updated
+# Run this script first to check required packages installed 
 
 # Check recent version of R installed
 if(getRversion() < "3.3.2") {
