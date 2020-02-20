@@ -2,9 +2,12 @@
 library("tidyverse")
 library("DBI") 
 
-fl <- list.files("community/R/", full.names = TRUE)
+# sources a few functions that are stored in China/community/R
+# those can be replaced by a package
+
+fl <- list.files("China/community/R/", full.names = TRUE)
 sapply(fl, source)
-path <- "community/"
+path <- "China/community/"
 
 ## ---- load_community
 
@@ -14,7 +17,7 @@ if(!exists("path")) {
 
 # make database connection
 #
-con <- src_sqlite(path = paste0(path, "data/transplant.sqlite"), create = FALSE)
+con <- src_sqlite(path = paste0(path, "/data/transplant.sqlite"), create = FALSE)
 
 #load cover data and metadata
 cover_thin <- load_comm(con = con)
