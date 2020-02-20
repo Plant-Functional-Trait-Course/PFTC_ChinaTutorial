@@ -63,3 +63,4 @@ assertthat::assert_that(all(c(CRAN_needed, github_needed$package) %in% .packages
 
 # clean-up
 rm(CRAN_needed, CRAN_needed2, github_needed, installed_packages)
+
