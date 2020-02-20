@@ -20,13 +20,12 @@ if(Sys.which("git") == ""){
 # Check CRAN packages installed
 CRAN_needed <- read.table(header = TRUE, stringsAsFactors = FALSE, text = 
                             "package
-                          tidyverse #this includes dplyr, ggplot, tidyr etc
+                          tidyverse #this includes dplyr,                             ggplot, tidyr etc
                           vegan
                           RSQLite
                           assertthat
-                          plyr
                           devtools
-                          cowplot
+                          patchwork
                           gridExtra
                           rmarkdown
                           assertr
@@ -55,7 +54,6 @@ github_needed <- read.table(header = TRUE, stringsAsFactors = FALSE, text =
    ggvegan gavinsimpson master
    tpldata gustavobio master
    tpl gustavobio master
-   osfr enterforopenscience master
    dataDownloader Between-the-Fjords master")
 
 # check all packages downloaded 
