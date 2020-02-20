@@ -1,0 +1,76 @@
+---
+title: "R tutorial China"
+author: "Julia Chacón"
+date: "17/2/2020"
+output: html_document
+---
+<style>
+p.caption {
+  font-size: 0.8em;
+}
+</style>
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+# TRANSPLANT EXPERIMENT GONGGA MOUNTAIN (CHINA)
+
+## Libraries and data
+
+First is important to install all the libraries needed (1), check that indeed we have all the library needed installed (2), call these libraries (3) and download the data to the correct folders.
+
+Here are all the steps to follow. Open the files if you want to see how are the instructions.
+
+1. Install the libraries
+```{r Libraries and data, eval=FALSE}
+source("install_packages.R")
+```
+2. Check out if everything is updated (R version and libraries) 
+
+```{r Libraries and data2, eval=FALSE}
+source("setup.R")
+```
+3. Call the libraries
+```{r Libraries and data3, eval=TRUE}
+library("tidyverse")
+library("dataDownloader")
+library("DBI")
+library("vegan")
+library("ggvegan")
+library("patchwork")
+```
+4. Download the data. 
+```{r Libraries and data4, eval=TRUE}
+source("instructions_to_download.R")
+```
+
+## Cover and composition data
+
+script: start_here.R 
+
+This script is going to:
+  
+  1. Read the data from the transplants (transplant.sqlite)
+2. Load cover data and metadata (cover_thin)
+3. Make a fat table (cover) with species names in columns and cover values in each plot
+4. Make meta data (cover_meta) This are the meta data of the "cover" tibble
+5. Make turf list (turfs)
+6. Get a taxonomy table, with abreviate and complete species names; authority; family and functional group. There is also other columns that appear empty.
+
+We can either source it or run it step by step to see what is doing:
+  
+  ```{r Cover and composition data, eval=TRUE}
+source("community/start_here.R") 
+```
+
+
+Here is the code of start_here.R in case you want to explore it a bit.
+
+
+
