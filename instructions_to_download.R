@@ -15,7 +15,7 @@ if(!exists("path")) {
 # China community data from the transplants:
 get_file(node = "4hjzu",
          file = "transplant.sqlite",
-         path = "China/community/data")
+         path = "community/data")
 
 ## TRAIT DATA
 path <- "traits/"
@@ -25,9 +25,9 @@ if(!exists("path")) {
 # China traits: Leaf traits
 get_file(node = "emzgf",
          file = "PFTC1.2_China_2015_2016_LeafTraits.csv",
-         path = "China/traits/data")
+         path = "traits/data")
 # China traits: Chemical traits
 get_file(node = "emzgf",
          file = "PFTC1.2_China_2015_2016_ChemicalTraits.csv",
-         path = "China/traits/data")
+         path = "traits/data")
 
