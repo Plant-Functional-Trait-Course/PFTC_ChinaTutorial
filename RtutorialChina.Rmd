@@ -25,7 +25,7 @@ This is an R tutorial for working with the Transplant Experiment data in Gongga 
 
 First, is important to install all the libraries needed (1), check that indeed we have all the library needed installed (2), call these libraries (3) and download the data to the correct folders.
 
-Here are all the steps to follow. The .R files are scripts with the codes. Open the files if you want to see how are the instructions.
+Here are all the steps to follow. The .R files are scripts with the codes. Open the files if you want to see the instructions (highly recommended).
 
 ## 1. Install the libraries:
 
@@ -73,14 +73,14 @@ This script is going to:
 
 We can either source it or run it step by step to see what is doing (preferred option). If you want to run it step by step then open the file.
 
-## Trait data
+### Trait data
 
 The traits data are located in China/traits/data, in two files: LeafTraits and ChemicalTraits. 
                                                             To read the csv files:
 ```{r Trait data, eval=TRUE}
 traitsLeaf <- read_csv(file = "traits/data/PFTC1.2_China_2015_2016_LeafTraits.csv", col_names = TRUE)
 
-traitsChem <- read_csv(file = "data_cleaned/PFTC1.2_China_2015_2016_ChemicalTraits.csv", col_names = TRUE)
+traitsChem <- read_csv(file = "traits/data/PFTC1.2_China_2015_2016_ChemicalTraits.csv", col_names = TRUE)
 ```
                                                                                                                  
                                                                                                                           
