@@ -32,11 +32,11 @@ library("patchwork")
 source("instructions_to_download.R")
 ```
 
-```{r Cover and composition data, include=FALSE}
+```{r Read cover and composition data, include=FALSE}
 source("start_here.R")
 ```
 
-```{r Trait data,include=FALSE}
+```{r Read trait data, include=FALSE}
 traitsLeaf <- read_csv(file = "traits/data/PFTC1.2_China_2015_2016_LeafTraits.csv", col_names = TRUE)
 
 traitsChem <- read_csv(file = "traits/data/PFTC1.2_China_2015_2016_ChemicalTraits.csv", col_names = TRUE)
@@ -89,23 +89,42 @@ Exploring the levels of each factor, allows to get an idea of the experimental s
 
 Again, we suggest starting exploring the data sets of traits, asking for the names of the columns, the levels of each factor, and dimensions.
 
-```{r Trait data2, eval=FALSE}
+```{r Trait data, eval=FALSE}
 colnames(traitsLeaf)
 colnames(traitsChem)
 ```
 
 Explore a bit the levels of each factor, and the variable names. They are coded differently to cover_thin.
 
-```{r Trait data3, eval=TRUE}
+```{r Trait data2, eval=TRUE}
 unique(traitsLeaf$Elevation)
+```
+```{r Trait data3, eval=TRUE}
 unique(traitsLeaf$Treatment)
 ```
 
 So, one important thing to do before exploring/analysing the data is to follow the same coding in the treatment levels for cover and traits data.
 
-In the traits data, there are 8 levels in Treatment, because LOCAL is referred to the traits that were measured outside the experimental plots. So no treatment there.
+In the traits data, Treatment has 8 levels, the extra one is LOCAL that refers to the traits that were measured outside the experimental plots. So no treatment there.
 
-In the cover data, there are 7 levels: "control" "local"   "warm1"   "cool1"   "warm3"   "cool3"   "OTC", and local is referred to the local transplants. So...the coding right now is really confusing. We want to change it, right?
+In the cover data, there are 7 levels: "control" "local"   "warm1"   "cool1"   "warm3"   "cool3"   "OTC", and local is referred to the local transplants. So...the coding is really confusing. We want to change it, right?
 
+### Rename the treatment levels
+
+Let´s rename the levels of Treatment:
+```{r Rename the treatment levels, eval=TRUE}
+traitsLeaf$Treatment <- recode(traitsLeaf$Treatment, "1" ="warm1", "2"="cool1", "3"="warm3", "4"="cool3", "0"="local", "C"= "control", "LOCAL"="outexp", "OTC"="OTC")
+
+traitsChem$Treatment <- recode(traitsChem$Treatment, "1" ="warm1", "2"="cool1", "3"="warm3", "4"="cool3", "0"="local", "C"= "control", "LOCAL"="outexp", "OTC"="OTC")
+```
+
+Check the levels of the Treatment: 
+CHANGE TO FACTOR AS COVER_THIN
+ORDENAR??
+```{r Rename the treatment levels2, eval=TRUE}
+unique(traitsLeaf$Treatment)
+unique(traitsChem$Treatment)
+levels(cover_thin$TTtreat)
+```
 
 
