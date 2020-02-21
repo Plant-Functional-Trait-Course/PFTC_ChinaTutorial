@@ -1,0 +1,111 @@
+---
+title: "R tutorial China: Exploring the data"
+author: "Julia Chacón"
+date: "20/2/2020"
+output: html_document
+---
+<style>
+p.caption {
+  font-size: 0.8em;
+}
+</style>
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+```{r Call the libraries, include=FALSE}
+library("tidyverse")
+library("dataDownloader")
+library("DBI")
+library("vegan")
+library("ggvegan")
+library("patchwork")
+```
+
+```{r Download the data, include=FALSE}
+source("instructions_to_download.R")
+```
+
+```{r Cover and composition data, include=FALSE}
+source("start_here.R")
+```
+
+```{r Trait data,include=FALSE}
+traitsLeaf <- read_csv(file = "traits/data/PFTC1.2_China_2015_2016_LeafTraits.csv", col_names = TRUE)
+
+traitsChem <- read_csv(file = "traits/data/PFTC1.2_China_2015_2016_ChemicalTraits.csv", col_names = TRUE)
+```
+                                                                          
+# TRANSPLANT EXPERIMENT GONGGA MOUNTAIN (CHINA)
+
+## 6. Exploring how the data are organized 
+
+### Cover and composition data
+
+cover_thin is an object that contains community data (cover data and composition of each turb and treatment). 
+
+Explore the columns names in cover_thin:
+```{r Exploring how the data are organized, eval=FALSE}
+colnames(cover_thin)
+```
+
+cover is a summary of the total cover of each species in cover_thin
+
+Explore the columns names in cover:
+```{r Exploring how the data are organized2, eval = FALSE}
+colnames(cover)
+```
+
+Check the dimensions of cover_thin and cover:
+```{r Exploring how the data are organized3, eval = TRUE, echo=TRUE}
+dim(cover_thin)
+dim(cover)
+```
+
+Check number of Sites:
+```{r Exploring how the data are organized4, eval=TRUE}
+levels(cover_thin$originSiteID) 
+```
+
+Check blocks per elevation/site:
+```{r Exploring how the data are organized5, eval=FALSE}
+unique(cover_thin$originBlockID)
+```
+
+Check treatments:
+```{r Exploring how the data are organized6, eval=TRUE}
+levels(cover_thin$TTtreat) 
+```
+
+Exploring the levels of each factor, allows to get an idea of the experimental setup. For example, number of sites, blocks per site, Treatments names, and how are the variables stored in cover_thin. Just to remember, there are four study sites that contains an in situ warming experiments using OTCs and reciprocal community transplantation experiments (i.e., warming and cooling) between all pairs of neighbouring sites along the gradient. There are seven blocks at each site. Within each of the seven blocks at each site, plots were randomly designated to SIX different experimental treatments. You can get a better idea reading the README file of the China data.
+
+### Trait data
+
+Again, we suggest starting exploring the data sets of traits, asking for the names of the columns, the levels of each factor, and dimensions.
+
+```{r Trait data2, eval=FALSE}
+colnames(traitsLeaf)
+colnames(traitsChem)
+```
+
+Explore a bit the levels of each factor, and the variable names. They are coded differently to cover_thin.
+
+```{r Trait data3, eval=TRUE}
+unique(traitsLeaf$Elevation)
+unique(traitsLeaf$Treatment)
+```
+
+So, one important thing to do before exploring/analysing the data is to follow the same coding in the treatment levels for cover and traits data.
+
+In the traits data, there are 8 levels in Treatment, because LOCAL is referred to the traits that were measured outside the experimental plots. So no treatment there.
+
+In the cover data, there are 7 levels: "control" "local"   "warm1"   "cool1"   "warm3"   "cool3"   "OTC", and local is referred to the local transplants. So...the coding right now is really confusing. We want to change it, right?
+
+
+
