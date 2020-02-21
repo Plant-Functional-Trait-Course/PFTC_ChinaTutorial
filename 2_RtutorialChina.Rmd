@@ -113,17 +113,24 @@ In the cover data, there are 7 levels: "control" "local"   "warm1"   "cool1"   "
 
 Let´s rename the levels of Treatment:
 ```{r Rename the treatment levels, eval=TRUE}
-traitsLeaf$Treatment <- recode(traitsLeaf$Treatment, "1" ="warm1", "2"="cool1", "3"="warm3", "4"="cool3", "0"="local", "C"= "control", "LOCAL"="outexp", "OTC"="OTC")
+traitsLeaf <- traitsLeaf %>%
+  mutate(Treatment=dplyr::recode(Treatment, "C"= "control", "0"="local", "1" ="warm1", "2"="cool1", "3"="warm3", "4"="cool3", "LOCAL"="outexp", "OTC"="OTC"))%>%
+mutate(Treatment = factor(Treatment, levels = c("local", "control", "warm1", "cool1", "warm3", "cool3","OTC", "outexp")))
 
-traitsChem$Treatment <- recode(traitsChem$Treatment, "1" ="warm1", "2"="cool1", "3"="warm3", "4"="cool3", "0"="local", "C"= "control", "LOCAL"="outexp", "OTC"="OTC")
+traitsChem <- traitsChem %>%
+  mutate(Treatment=dplyr::recode(Treatment,"C"= "control","0"="local", "1" ="warm1", "2"="cool1", "3"="warm3", "4"="cool3", "LOCAL"="outexp", "OTC"="OTC")) %>%
+mutate(Treatment = factor(Treatment, levels = c("local", "control", "warm1", "cool1", "warm3", "cool3", "OTC", "outexp")))
+
 ```
 
 Check the levels of the Treatment: 
 CHANGE TO FACTOR AS COVER_THIN
 ORDENAR??
 ```{r Rename the treatment levels2, eval=TRUE}
-unique(traitsLeaf$Treatment)
-unique(traitsChem$Treatment)
+levels(traitsLeaf$Treatment)
+```
+
+```{r Rename the treatment levels3, eval=TRUE}
 levels(cover_thin$TTtreat)
 ```
 
