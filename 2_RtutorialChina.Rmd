@@ -120,12 +120,9 @@ mutate(Treatment = factor(Treatment, levels = c("local", "control", "warm1", "co
 traitsChem <- traitsChem %>%
   mutate(Treatment=dplyr::recode(Treatment,"C"= "control","0"="local", "1" ="warm1", "2"="cool1", "3"="warm3", "4"="cool3", "LOCAL"="outexp", "OTC"="OTC")) %>%
 mutate(Treatment = factor(Treatment, levels = c("local", "control", "warm1", "cool1", "warm3", "cool3", "OTC", "outexp")))
-
 ```
 
-Check the levels of the Treatment: 
-CHANGE TO FACTOR AS COVER_THIN
-ORDENAR??
+Check the levels now:
 ```{r Rename the treatment levels2, eval=TRUE}
 levels(traitsLeaf$Treatment)
 ```
@@ -133,5 +130,3 @@ levels(traitsLeaf$Treatment)
 ```{r Rename the treatment levels3, eval=TRUE}
 levels(cover_thin$TTtreat)
 ```
-
-
