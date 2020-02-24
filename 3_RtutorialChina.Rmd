@@ -1,5 +1,5 @@
 ---
-title: "R tutorial China: Getting started"
+title: "R tutorial China: Traits"
 author: "Julia Chacón"
 date: "21/2/2020"
 output: html_document
@@ -52,20 +52,18 @@ Step 2: New format to the leaf traits data, with traits and values in two column
 ```{r Data wrangling3, eval=TRUE}
 
 ### we can change gather for pivot_longer!!!
-
 traitsLongL <- traitsWideL %>% 
-  select(Date, Elevation, Site, Taxon, Individual_number, Leaf_number, Wet_Mass_g.log, Dry_Mass_g.log, Leaf_Thickness_Ave_mm.log, Leaf_Area_cm2.log, SLA_cm2_g, LDMC) %>% 
-  gather(key = Traits, value = Value, -Date, -Elevation, -Site, -Taxon, -Individual_number, -Leaf_number)
+  select(Date, Elevation, Site, Treatment, Taxon, Individual_number, Leaf_number, Wet_Mass_g.log, Dry_Mass_g.log, Leaf_Thickness_Ave_mm.log, Leaf_Area_cm2.log, SLA_cm2_g, LDMC) %>% 
+  gather(key = Traits, value = Value, -Date, -Elevation, -Site, -Treatment, -Taxon, -Individual_number, -Leaf_number)
 ```
 
 Step 3: New format to the leaf Chemical traits (same manner). These values are percentage, so we don´t need to log transform these traits:
 
 ```{r Data wrangling4, eval=TRUE}
 ### we can change gather for pivot_longer!!!
-
 traitsLongC <- traitsChem %>% 
-  select(Date, Elevation, Site, Taxon, P_percent, C_percent, N_percent, CN_ratio, dN15_percent, dC13_percent) %>% 
-  gather(key = Traits, value = Value, -Date, -Elevation, -Site, -Taxon)
+  select(Date, Elevation, Site, Treatment, Taxon, P_percent, C_percent, N_percent, CN_ratio, dN15_percent, dC13_percent) %>% 
+  gather(key = Traits, value = Value, -Date, -Elevation, -Site,-Treatment, -Taxon)
 ```
 
 Step 4: Bind the two data sets (Leaf and Chemical traits), using the two "long" tables:
@@ -131,6 +129,77 @@ TraitBoxp.plot
     
 For saving the plots:
 ```{r, echo=FALSE, eval=FALSE}
-ggsave(TraitDist.plot, filename = "TraitDist.jpg", height = 13, width = 13, dpi = 300)
-ggsave(TraitBox.plot, filename = "TraitDist.jpg", height = 13, width = 13, dpi = 300)
+#ggsave(TraitDist.plot, filename = "TraitDist.jpg", height = 13, width = 13, dpi = 300)
+#ggsave(TraitBox.plot, filename = "TraitDist.jpg", height = 13, width = 13, dpi = 300)
+```
+
+### Traits scatterplots
+
+####  Data wrangling
+
+This are just some scatterplots relating 2 traits values. Each dot is an observation, and each coordinate represent the value of each of the traits.Fitting traits again each other is very usefull to fit outliers and to detect weird relationships that could indicate an error in the dataset.
+
+Some expamples:
+
+```{r Traits scatterplots, eval=TRUE}
+DryWet <- traitsWideL %>% 
+  ggplot(aes(x = Dry_Mass_g.log, y = Wet_Mass_g.log, colour = Site)) +
+  geom_point(alpha = 0.4) +
+  scale_color_brewer(palette = "RdBu", direction = -1, labels=c("High alpine", "Alpine", "Middle", "Lowland")) +
+  theme(legend.position = "none")
+```
+
+```{r Traits scatterplots2, eval=TRUE}
+DryArea <- DryWet + aes(x = Dry_Mass_g.log, y = Leaf_Area_cm2.log) +
+  theme(legend.position = "right")
+AreaSLA <- DryWet + aes(x = Leaf_Area_cm2, y = SLA_cm2_g)
+LDMCThick <- DryWet + aes(x = LDMC, y = Leaf_Thickness_Ave_mm) 
+```
+
+```{r Traits scatterplots3, eval=TRUE}
+DryWet + DryArea + AreaSLA + LDMCThick
+```
+
+### Traits means
+
+We want to plot the mean values and standard error of each invidual trait, at each site, and for each treatment separately. In the plots that we did before we did not differenciate between treatments, but now we do. We are going to use again "traitsLong" object
+
+#### Plot of the means per trait
+
+Plotting the mean values and standard errors for each trait, per site and treatment.
+
+Step 1: Summarize the data from traitsLong. The next code, will make a summary table with the mean values, stardard deviation and stardard errors, grouping the column Value, by Trait, Treatment and Site.
+
+I have excluded the values of "outexp" (data from outside the experimental turfs)
+
+```{r Plot of the means per trait2, eval=TRUE}
+TraitsSE <- traitsLong %>% 
+  filter(!is.na(Value)) %>%
+  filter(Treatment!= "outexp") %>%
+  group_by(Site, Treatment, Traits) %>%
+  summarize(N = length(Value), mean = mean(Value), sd = sd(Value), se = sd / sqrt(N))
+
+TraitsSE 
+```
+
+Step 2: Make the plot. Define first the position_dodge, this argument allow you to move horizontaly the errors bars, so they don´t overlap. Exercise: see what happens if you don´t define the position_dodge, or try to change the value.
+
+```{r Plot of the means per trait3, eval=TRUE}
+pd <- position_dodge(0.4)
+
+TraitsSE.p <- ggplot(TraitsSE, aes(x = Site, y=mean,  colour=Treatment)) +
+  geom_errorbar(aes(ymin=mean-se, ymax=mean+se), width=.1, position=pd) +
+  geom_line(position=pd) +
+  geom_point(position=pd)+
+  labs(x = "Site", y = "Mean/se trait value") +
+  facet_wrap( ~ Traits, scales = "free") +
+  theme(legend.position="top")
+
+TraitsSE.p 
+
+```
+
+For saving the plot:
+```{r Plot of the means per trait4, echo=TRUE, eval=FALSE}
+ggsave(TraitsSE.p, filename = "TraitSE.jpg", height = 13, width = 13, dpi = 300)
 ```
