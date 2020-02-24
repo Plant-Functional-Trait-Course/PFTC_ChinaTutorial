@@ -1,0 +1,137 @@
+---
+title: "R tutorial China: Getting started"
+author: "Julia Chacón"
+date: "21/2/2020"
+output: html_document
+---
+
+<style>
+p.caption {
+  font-size: 0.8em;
+}
+</style>
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+```{r, include=FALSE}
+source("starter.R")
+```
+
+### Trait Distributions
+
+####  Data wrangling
+
+Here is the code for plotting the traits distributions. 
+Before ploting the trait ditributions, we need to make some changes to the datasets and log transform the variables, to finally merge the two trait data sets into a single one.
+
+First, you can see that Site is stored as "character". 
+```{r Data wrangling, eval=TRUE}
+mode(traitsLeaf$Site)
+```
+
+Step 1: For plotting purpuses is better to transform this variable to a factor, with four levels ("L", "M", "A", "H"). We will also log transform the traits, this will help to reduce the skewness of the values and to make the relationships between traits clearer.
+
+```{r Data wrangling2, eval=TRUE}
+traitsWideL <- traitsLeaf %>% 
+  mutate(Wet_Mass_g.log = log(Wet_Mass_g),
+         Dry_Mass_g.log = log(Dry_Mass_g),
+         Leaf_Thickness_Ave_mm.log = log(Leaf_Thickness_Ave_mm),
+         Leaf_Area_cm2.log = log(Leaf_Area_cm2)) %>% 
+  mutate(Site = factor(Site, levels = c("L", "M", "A", "H"))) 
+```
+
+Step 2: New format to the leaf traits data, with traits and values in two columns: 
+
+```{r Data wrangling3, eval=TRUE}
+
+### we can change gather for pivot_longer!!!
+
+traitsLongL <- traitsWideL %>% 
+  select(Date, Elevation, Site, Taxon, Individual_number, Leaf_number, Wet_Mass_g.log, Dry_Mass_g.log, Leaf_Thickness_Ave_mm.log, Leaf_Area_cm2.log, SLA_cm2_g, LDMC) %>% 
+  gather(key = Traits, value = Value, -Date, -Elevation, -Site, -Taxon, -Individual_number, -Leaf_number)
+```
+
+Step 3: New format to the leaf Chemical traits (same manner). These values are percentage, so we don´t need to log transform these traits:
+
+```{r Data wrangling4, eval=TRUE}
+### we can change gather for pivot_longer!!!
+
+traitsLongC <- traitsChem %>% 
+  select(Date, Elevation, Site, Taxon, P_percent, C_percent, N_percent, CN_ratio, dN15_percent, dC13_percent) %>% 
+  gather(key = Traits, value = Value, -Date, -Elevation, -Site, -Taxon)
+```
+
+Step 4: Bind the two data sets (Leaf and Chemical traits), using the two "long" tables:
+
+```{r Data wrangling5, eval=TRUE}
+traitsLong <- traitsLongL %>% bind_rows(traitsLongC)
+```
+
+Make the Site a factor instead of a character, and order the levels from L to H (upslope)
+```{r Data wrangling6, eval=TRUE}
+traitsLong <- traitsLong %>% 
+  mutate(Site = factor(Site, levels = c("L", "M", "A", "H"))) 
+```
+
+A short note:
+
+Reasons for mutating character names into a factor (or why sometimes is better to use factor instead of character in R): This is not 100% neccesary and you can load the upcomming codes without mutating the Traits names into a factor, so no worries too much about this lines. But here is the explanation. Factors are stored as numbers (integers) and have labels associated with these unique numbers (the values or names you assigned) and a table of levels. This saves a lot of memory compared to character. In case you are working with categorical data (predifined, finite number of values) is generally better to use factors instead of character. Although factors look like as character vectors they are integers in their "heart". They are stored in alphabetical order or we can define a meaningfull order (as we did with Site or will do with the Traits names). Compared to simple integers (1,2,3,4), factors are "self-describing" ("L","M","A","H").
+
+
+#### Density plot
+
+Here is the code to plot the traits distributions, using density plots. A density plot is similar to an histogram, and allows visualizing the distribution of a numerical variable (it shows the interval and the peaks of the distribution). The peaks of a density plot show where the values are concentrated over the interval.
+
+We want to plot the distribution of each invidual trait, at each site, to visualize their variation. So, first we filter the values containing NA´s, since we are not interested in that and transform the Traits names into a factor (they are stored as character). Then, we plot it using ggplot. The values of each trait are going to appear in the x coordinate (Value) and their frequency in coordinate y. Density curves appear on different colors based on the Site (fill=Site).
+
+`geom_density(alpha = 0.5)´ argument simply fills the density curves with a transparent color.
+
+`facet_wrap´ argument allows spliting the plot into the different Traits
+
+```{r Density plot, eval=TRUE}
+TraitDist <- traitsLong %>% 
+  filter(!is.na(Value)) %>% 
+  mutate(Traits = factor(Traits, levels = c("Wet_Mass_g.log", "Dry_Mass_g.log", "Leaf_Thickness_Ave_mm.log", "Leaf_Area_cm2.log", "SLA_cm2_g", "LDMC", "P_percent", "C_percent", "N_percent", "CN_ratio", "dN15_percent", "dC13_percent"))) # if you don´t understand why we are mutating Traits into a factor, you can just remove the last part of this code. It won´t make a huge difference.
+  
+TraitDist.plot <- ggplot(TraitDist, aes(x = Value, fill = Site)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_brewer(palette = "RdBu", direction = -1, labels=c("High alpine", "Alpine", "Middle", "Lowland")) +
+  labs(x = "Mean trait value", y = "Density") +
+  facet_wrap( ~ Traits, scales = "free") +
+  theme(legend.position="top")
+
+TraitDist.plot
+```
+
+
+Exercise:
+
+Try to plot the same density plot, but using only the values of one of the treatments. For example, only the "LOCAL" values, or the "OTC" values.
+
+
+#### Boxplots
+
+A different way of displaying the distribution of the data is using boxplots. Boxplots are a graph showing how the values are spread out, similarly to the density plots. Sometimes boxplots are more informative that other measures of central tendencies like the mean. We are using here the object TraitDist, defined before.
+
+```{r Boxplots, eval=TRUE}
+TraitBoxp.plot <- ggplot(TraitDist, aes(x=Site, y = Value, fill = Site)) +
+ geom_boxplot() +
+ scale_fill_brewer(palette = "RdBu", direction = -1, labels=c("High alpine", "Alpine", "Middle", "Lowland")) +
+  facet_wrap( ~ Traits, scales = "free") +
+  theme(legend.position="top")
+
+TraitBoxp.plot
+```
+    
+For saving the plots:
+```{r, echo=FALSE, eval=FALSE}
+ggsave(TraitDist.plot, filename = "TraitDist.jpg", height = 13, width = 13, dpi = 300)
+ggsave(TraitBox.plot, filename = "TraitDist.jpg", height = 13, width = 13, dpi = 300)
+```
