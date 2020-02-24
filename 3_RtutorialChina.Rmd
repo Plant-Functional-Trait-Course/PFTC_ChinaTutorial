@@ -110,7 +110,6 @@ TraitDist.plot <- ggplot(TraitDist, aes(x = Value, fill = Site)) +
 TraitDist.plot
 ```
 
-
 Exercise:
 
 Try to plot the same density plot, but using only the values of one of the treatments. For example, only the "LOCAL" values, or the "OTC" values.
