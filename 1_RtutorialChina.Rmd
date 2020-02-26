@@ -23,11 +23,22 @@ knitr::opts_chunk$set(
 
 This is an R tutorial for working with the Transplant Experiment data in Gongga Mountain, China. The purpose of the tutorial is to be able to download the data, read them and understand their structure prior to "play" with them.
 
+## STUDY AND SITE INFORMATION
+The transplant study is located in the Gongga Mountains in Sichuan Province, south-west China. The study contains four sites spanning from 3000 to 4130 m a.s.l. along an elevational gradient. The vegetation ranges from coniferous-broadleaved forest to alpine meadows.
+
+```{r echo=FALSE, out.width='60%', fig.cap= "Location of the four study sites along an elevational gradient. Inset indicates the locations of the study sites in China."}
+knitr::include_graphics('./map/TransplantMap.png')
+```
+
+```{r echo=FALSE, out.width='60%', fig.cap= "Experimental set up for the different warming treatments at each site. Shown are control, local control, OTC, and transplant and arrows indicate direction of transplant"}
+knitr::include_graphics('./map/ChinaMountain.jpg')
+```
+
+## 1. Install the libraries
+
 First, is important to install all the libraries needed (1), check that indeed we have all the library needed installed (2), call these libraries (3) and download the data to the correct folders.
 
 Here are all the steps to follow. The .R files are scripts with the codes. Open the files if you want to see the instructions (highly recommended).
-
-## 1. Install the libraries
 
 ```{r Install the libraries, eval=FALSE}
 source("install_packages.R")
