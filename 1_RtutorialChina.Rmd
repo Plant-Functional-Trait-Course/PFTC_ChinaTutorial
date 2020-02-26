@@ -52,6 +52,8 @@ library("patchwork")
 ```
 
 ## 4. Download the data
+
+I think it is important for you to inspect this file "instructions_to_download.R"
 ```{r Download the data, eval=TRUE}
 source("instructions_to_download.R")
 ```
