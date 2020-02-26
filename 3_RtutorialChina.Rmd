@@ -50,20 +50,17 @@ traitsWideL <- traitsLeaf %>%
 Step 2: New format to the leaf traits data, with traits and values in two columns: 
 
 ```{r Data wrangling3, eval=TRUE}
-
-### we can change gather for pivot_longer!!!
 traitsLongL <- traitsWideL %>% 
   select(Date, Elevation, Site, Treatment, Taxon, Individual_number, Leaf_number, Wet_Mass_g.log, Dry_Mass_g.log, Leaf_Thickness_Ave_mm.log, Leaf_Area_cm2.log, SLA_cm2_g, LDMC) %>% 
-  gather(key = Traits, value = Value, -Date, -Elevation, -Site, -Treatment, -Taxon, -Individual_number, -Leaf_number)
+  pivot_longer(cols=c("Wet_Mass_g.log", "Dry_Mass_g.log", "Leaf_Thickness_Ave_mm.log", "Leaf_Area_cm2.log", "SLA_cm2_g", "LDMC"), names_to="Traits", values_to = "Value")
 ```
 
 Step 3: New format to the leaf Chemical traits (same manner). These values are percentage, so we don´t need to log transform these traits:
 
 ```{r Data wrangling4, eval=TRUE}
-### we can change gather for pivot_longer!!!
 traitsLongC <- traitsChem %>% 
   select(Date, Elevation, Site, Treatment, Taxon, P_percent, C_percent, N_percent, CN_ratio, dN15_percent, dC13_percent) %>% 
-  gather(key = Traits, value = Value, -Date, -Elevation, -Site,-Treatment, -Taxon)
+  pivot_longer(cols=c("P_percent", "C_percent","N_percent", "CN_ratio", "dN15_percent", "dC13_percent"), names_to="Traits", values_to = "Value")
 ```
 
 Step 4: Bind the two data sets (Leaf and Chemical traits), using the two "long" tables:
@@ -111,7 +108,6 @@ TraitDist.plot
 Exercise:
 
 Try to plot the same density plot, but using only the values of one of the treatments. For example, only the "LOCAL" values, or the "OTC" values.
-
 
 #### Boxplots
 
@@ -193,15 +189,12 @@ TraitsSE.p <- ggplot(TraitsSE, aes(x = Site, y=mean,  colour=Treatment)) +
   theme(legend.position="top")
 
 TraitsSE.p 
-
 ```
 
 For saving the plot:
 ```{r Plot of the means per trait4, echo=TRUE, eval=FALSE}
 ggsave(TraitsSE.p, filename = "TraitSE.jpg", height = 13, width = 13, dpi = 300)
 ```
-
-
 
 ### Community weighted means 
 
@@ -240,11 +233,11 @@ cover_2012C <- cover_thin %>%
   select(originSiteID, originPlotID, turfID, TTtreat, year, cover, speciesName) # select only a few variables (we dont need everything)
 ```
 
-Now, calculate the species weights based on mean cover of each species at each site in 2012 in the Control plots. Just a mean of the cover!
-*****instead of originsiteID, originplotID or turfID*****
+Now, calculate the species weights based on mean cover of each species at each site in 2012 in the Control plots. Just a mean of the cover per site for each species!
+
 ```{r}
 spp.wts2012C <- cover_2012C %>% 
-  group_by(originPlotID, speciesName) %>%
+  group_by(originSiteID, speciesName) %>%
   summarise(wts = mean(cover))
 ```
 
@@ -257,16 +250,14 @@ names(traits.meanvalues) # names of the columns or variables
 
 So, first we are going to change the second column name in ssp.wts2012C and call it "Taxon", and after that we can join the two tables.
 
-***USE LEFTJOIN OR WHATEVER***
 ```{r}
 spp.wts2012C <- rename(spp.wts2012C, Taxon=speciesName)
+spp.wts2012C <- rename(spp.wts2012C, Site=originSiteID)
 
 # and then merge:
-traits.wts <- merge(spp.wts2012C, traits.meanvalues, by="Taxon") %>%
-    arrange(originPlotID)
-
-
-colnames(traits.wts)
+traits.wts <- merge(spp.wts2012C, traits.meanvalues, by=c("Taxon", "Site")) %>%
+    arrange(Site)%>%
+  mutate(Site= factor(Site, levels=c("L", "M", "A","H")))
 
 traits.wtsL <- traits.wts %>% 
 pivot_longer(cols = c("C_percent", "CN_ratio","dC13_percent","dN15_percent", "Dry_Mass_g.log", "LDMC", "Leaf_Area_cm2.log", "Leaf_Thickness_Ave_mm.log", "N_percent", "P_percent", "SLA_cm2_g", "Wet_Mass_g.log"), names_to = "traits", values_to = "value")
@@ -280,8 +271,6 @@ Step 1: Summarize the CWM for each trait (but now we also group by year for calc
 cwm <- traits.wtsL %>% 
 group_by(Site, traits) %>% 
   summarise(wm = weighted.mean(value, wts, na.rm=TRUE))
-
-cwm
 ```
 
 Step 2: Plot
