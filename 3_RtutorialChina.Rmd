@@ -137,10 +137,9 @@ For saving the plots:
 
 ####  Data wrangling
 
-This are just some scatterplots relating 2 traits values. Each dot is an observation, and each coordinate represent the value of each of the traits.Fitting traits again each other is very usefull to fit outliers and to detect weird relationships that could indicate an error in the dataset.
+This are just some scatterplots relating 2 traits values. Each dot is an observation, and each coordinate represent the value of each of the traits. Fitting traits again each other is very usefull to detect outliers and weird relationships that could indicate an error or outliers in the dataset.
 
-Some expamples:
-
+Some expamples of scatterplots:
 ```{r Traits scatterplots, eval=TRUE}
 DryWet <- traitsWideL %>% 
   ggplot(aes(x = Dry_Mass_g.log, y = Wet_Mass_g.log, colour = Site)) +
@@ -178,8 +177,6 @@ TraitsSE <- traitsLong %>%
   filter(Treatment!= "outexp") %>%
   group_by(Site, Treatment, Traits) %>%
   summarize(N = length(Value), mean = mean(Value), sd = sd(Value), se = sd / sqrt(N))
-
-TraitsSE 
 ```
 
 Step 2: Make the plot. Define first the position_dodge, this argument allow you to move horizontaly the errors bars, so they don´t overlap. Exercise: see what happens if you don´t define the position_dodge, or try to change the value.
@@ -203,3 +200,126 @@ For saving the plot:
 ```{r Plot of the means per trait4, echo=TRUE, eval=FALSE}
 ggsave(TraitsSE.p, filename = "TraitSE.jpg", height = 13, width = 13, dpi = 300)
 ```
+
+
+
+### Community weighted means 
+
+Calculation of community weighted means. An 'easy' (and not very meaningful) example using only data from 2012 and the Control plots.
+
+#### Data wrangling
+
+For the traits calculations we are going to use traitsLong, you can check how we built this data frame in the previous codes. Now, just select the variables Site, Treatment, Taxon, Traits and Value to manage a smaller set of data.
+
+```{r}
+traitsLong <- traitsLong %>%
+  select(Site, Treatment, Taxon, Traits, Value) %>%
+  mutate(Site= factor(Site, levels=c("L", "M", "A","H")))
+```
+
+##### Calculate mean trait values
+
+And calculate the mean trait values for each taxon per site. Trait values can be assign in different ways. But now, we are going to use mean trait values per sites for simplicity.
+
+```{r}
+traits.meanvalues <- traitsLong %>% 
+  filter(!is.na(Value)) %>%
+  group_by(Site, Traits, Taxon) %>%
+  summarise(mean = mean(Value)) %>%
+  spread(key = Traits, value = mean)
+```
+
+##### Calculate the weights
+
+Subset the cover data, by year and treatment, to include only 2012 and Control plots. We are going to use the cover data of each species in each site as a "weight" for calculating the community weighted means. 
+
+```{r}
+cover_2012C <- cover_thin %>%
+  filter(year == "2012")%>% # subset the year
+  filter(TTtreat =="control")%>% # subset the control
+  select(originSiteID, originPlotID, turfID, TTtreat, year, cover, speciesName) # select only a few variables (we dont need everything)
+```
+
+Now, calculate the species weights based on mean cover of each species at each site in 2012 in the Control plots. Just a mean of the cover!
+*****instead of originsiteID, originplotID or turfID*****
+```{r}
+spp.wts2012C <- cover_2012C %>% 
+  group_by(originPlotID, speciesName) %>%
+  summarise(wts = mean(cover))
+```
+
+Now, we need to merge the species weights with their mean trait values in a single data frame, and we are going to use the column "Taxon" to conect both data frame. But, the two data frames have different column names for the species names as you will see here:
+
+```{r}
+names(spp.wts2012C) # names of the columns or variables
+names(traits.meanvalues) # names of the columns or variables 
+```
+
+So, first we are going to change the second column name in ssp.wts2012C and call it "Taxon", and after that we can join the two tables.
+
+***USE LEFTJOIN OR WHATEVER***
+```{r}
+spp.wts2012C <- rename(spp.wts2012C, Taxon=speciesName)
+
+# and then merge:
+traits.wts <- merge(spp.wts2012C, traits.meanvalues, by="Taxon") %>%
+    arrange(originPlotID)
+
+
+colnames(traits.wts)
+
+traits.wtsL <- traits.wts %>% 
+pivot_longer(cols = c("C_percent", "CN_ratio","dC13_percent","dN15_percent", "Dry_Mass_g.log", "LDMC", "Leaf_Area_cm2.log", "Leaf_Thickness_Ave_mm.log", "N_percent", "P_percent", "SLA_cm2_g", "Wet_Mass_g.log"), names_to = "traits", values_to = "value")
+```
+
+There we go:
+
+Step 1: Summarize the CWM for each trait (but now we also group by year for calculating)
+
+```{r}
+cwm <- traits.wtsL %>% 
+group_by(Site, traits) %>% 
+  summarise(wm = weighted.mean(value, wts, na.rm=TRUE))
+
+cwm
+```
+
+Step 2: Plot
+
+```{r}
+pd <- position_dodge(0.4)
+
+cwm.p <- cwm %>% 
+ mutate(traits = factor(traits, levels = c("Wet_Mass_g.log", "Dry_Mass_g.log", "Leaf_Thickness_Ave_mm.log", "Leaf_Area_cm2.log", "SLA_cm2_g", "LDMC", "P_percent", "C_percent", "N_percent", "CN_ratio", "dN15_percent", "dC13_percent"))) 
+  
+cwm.p = as.data.frame(cwm.p) #transform to a data frame
+
+cwm.p <- ggplot(cwm.p, aes(x = Site, y= wm)) +
+ geom_point(position=pd, shape=17) +
+ labs(x = "Site", y = "CWM", title="Control plots 2012") +
+ facet_wrap( ~ traits, scales = "free") +
+ theme(legend.position="top", plot.title = element_text(size = (15))) 
+
+cwm.p
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
