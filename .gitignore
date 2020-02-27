@@ -9,7 +9,6 @@
 *.Rdata
 *.odb
 *.zip
-*.jpg
 *.sql
 *.xlsx
 *.docx
@@ -17,3 +16,4 @@
 *.sqlite
 *.dat
 *.rds
+*html
