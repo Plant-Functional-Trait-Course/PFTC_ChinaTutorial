@@ -13,9 +13,6 @@ install.packages("osfr")
 
 # Install libraries from GitHub:
 library(devtools)
-remotes::install_github("richardjtelford/ggbiplot")
 remotes::install_github("gavinsimpson/ggvegan")
-remotes::install_github("gustavobio/tpldata")
-remotes::install_github("gustavobio/tpl")
 devtools::install_github("Between-the-Fjords/dataDownloader")
 
