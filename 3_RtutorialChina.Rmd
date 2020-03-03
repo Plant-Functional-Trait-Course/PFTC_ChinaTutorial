@@ -29,7 +29,7 @@ source("hidden/starter.R")
 ####  Data wrangling
 
 Here is the code for plotting the traits distributions. 
-Before ploting the trait ditributions, we need to make some changes to the datasets and log transform the variables, to finally merge the two trait data sets into a single one.
+Before plotting the trait distributions, we need to make some changes to the datasets and log transform the variables, to finally merge the two trait data sets into a single one.
 
 First, you can see that Site is stored as "character". 
 ```{r Data wrangling, eval=TRUE}
@@ -73,17 +73,17 @@ traitsLong <- traitsLongL %>% bind_rows(traitsLongC) %>%
 
 A short note:
 
-Reasons for mutating character names into a factor (or why sometimes is better to use factor instead of character in R): This is not 100% neccesary and you can load the upcomming codes without mutating the Traits names into a factor, so no worries too much about this lines. But here is the explanation. In case you are working with categorical data (predefined, finite number of values) is generally better to use factors instead of character. Although factors look like as character vectors they are integers in their "heart". They are stored in alphabetical order or we can define a meaningfull order (as we did with Site or will do with the Traits names). When defined in a particular order you are forcing the order of facets, or the order of labels, etc... in plots. Compared to simple integers (1,2,3,4), factors are "self-describing" ("L","M","A","H").
+Reasons for mutating character names into a factor (or why sometimes is better to use factor instead of character in R): This is not 100% necessary and you can load the upcoming codes without mutating the Traits names into a factor, so no worries too much about this lines. But here is the explanation. In case you are working with categorical data (predefined, finite number of values) is generally better to use factors instead of character. Although factors look like as character vectors they are integers in their "heart". They are stored in alphabetical order or we can define a meaningful order (as we did with Site or will do with the Traits names). When defined in a particular order you are forcing the order of facets, or the order of labels, etc... in plots. Compared to simple integers (1,2,3,4), factors are "self-describing" ("L","M","A","H").
 
 #### Density plot
 
 Here is the code to plot the traits distributions, using density plots. A density plot is similar to an histogram, and allows visualizing the distribution of a numerical variable (it shows the interval and the peaks of the distribution). The peaks of a density plot show where the values are concentrated over the interval.
 
-We want to plot the distribution of each invidual trait, at each site, to visualize their variation. So, first we `filter` the values containing NA´s, since we are not interested in that and transform the Traits names into a factor (they are stored as character). Then, we plot it using `ggplot`. The values of each trait are going to appear in the x coordinate (Value) and their frequency in coordinate y. Density curves appear on different colors based on the Site (`fill = Site`).
+We want to plot the distribution of each individual trait, at each site, to visualize their variation. So, first we `filter` the values containing NA´s, since we are not interested in that and transform the Traits names into a factor (they are stored as character). Then, we plot it using `ggplot`. The values of each trait are going to appear in the x coordinate (Value) and their frequency in coordinate y. Density curves appear on different colours based on the Site (`fill = Site`).
 
-`geom_density(alpha = 0.5)´ argument simply fills the density curves with a transparent color.
+`geom_density(alpha = 0.5)´ argument simply fills the density curves with a transparent colour.
 
-`facet_wrap´ argument allows spliting the plot into the different Traits
+`facet_wrap´ argument allows splitting the plot into the different Traits
 
 ```{r Density plot, eval=TRUE}
 traitsLong <- traitsLong %>% 
@@ -107,7 +107,7 @@ Try to plot the same density plot, but using only the values of one of the treat
 
 #### Boxplots
 
-A different way of displaying the distribution of the data is using boxplots. Boxplots are a graph showing how the values are spread out, similarly to the density plots. Sometimes boxplots are more informative that other measures of central tendencies like the mean. We are using here the object TraitDist, defined before.
+A different way of displaying the distribution of the data is using boxplots. Boxplots are a graph showing how the values are spread out, similarly to the density plots. Sometimes boxplots are more informative that other measures of central tendencies like the mean. We are using here the object `TraitDist`, defined before.
 
 ```{r Boxplots, eval=TRUE}
 TraitBoxp.plot <- ggplot(traitsLong, aes(x = Site, y = Value, fill = Site)) +
@@ -129,9 +129,9 @@ For saving the plots:
 
 ####  Data wrangling
 
-This are just some scatterplots relating 2 traits values. Each dot is an observation, and each coordinate represent the value of each of the traits. Fitting traits again each other is very usefull to detect outliers and weird relationships that could indicate an error or outliers in the dataset.
+This are just some scatterplots relating 2 traits values. Each dot is an observation, and each coordinate represent the value of each of the traits. Fitting traits again each other is very useful to detect outliers and weird relationships that could indicate an error or outliers in the dataset.
 
-Some expamples of scatterplots:
+Some examples of scatterplots:
 ```{r Traits scatterplots, eval=TRUE}
 DryWet <- traitsWideL %>% 
   ggplot(aes(x = Dry_Mass_g.log, y = Wet_Mass_g.log, colour = Site)) +
@@ -154,13 +154,13 @@ DryWet + DryArea + AreaSLA + LDMCThick + plot_layout(guides = "collect")
 
 ### Traits means
 
-We want to plot the mean values and standard error of each invidual trait, at each site, and for each treatment separately. In the plots that we did before we did not differenciate between treatments, but now we do. We are going to use again "traitsLong" object
+We want to plot the mean values and standard error of each individual trait, at each site, and for each treatment separately. In the plots that we did before we did not differentiate between treatments, but now we do. We are going to use again `traitsLong` object.
 
 #### Plot of the means per trait
 
 Plotting the mean values and standard errors for each trait, per site and treatment.
 
-Step 1: Summarize the data from traitsLong. The next code, will make a summary table with the mean values, stardard deviation and stardard errors, grouping the column Value, by Trait, Treatment and Site.
+Step 1: Summarize the data from `traitsLong`. The next code, will make a summary table with the mean values, standard deviation and standard errors, grouping the column Value, by Trait, Treatment and Site.
 
 I have excluded the values of "outexp" (data from outside the experimental turfs)
 
@@ -172,7 +172,7 @@ TraitsSE <- traitsLong %>%
   summarize(N = length(Value), mean = mean(Value), sd = sd(Value), se = sd / sqrt(N))
 ```
 
-Step 2: Make the plot. Define first the position_dodge, this argument allow you to move horizontaly the errors bars, so they don´t overlap. Exercise: see what happens if you don´t define the position_dodge, or try to change the value.
+Step 2: Make the plot. Define first the position_dodge, this argument allow you to move horizontally the errors bars, so they don´t overlap. Exercise: see what happens if you don´t define the position_dodge, or try to change the value.
 
 ```{r Plot of the means per trait3, eval=TRUE}
 pd <- position_dodge(0.4)
@@ -199,7 +199,7 @@ Calculation of community weighted means. An 'easy' (and not very meaningful) exa
 
 #### Data wrangling
 
-For the traits calculations we are going to use traitsLong, you can check how we built this data frame in the previous codes. Now, just select the variables Site, Treatment, Taxon, Traits and Value to manage a smaller set of data.
+For the traits calculations we are going to use `traitsLong`, you can check how we built this data frame in the previous codes. Now, just select the variables Site, Treatment, Taxon, Traits and Value to manage a smaller set of data.
 
 ```{r}
 traitsLong <- traitsLong %>%
@@ -237,14 +237,14 @@ spp.wts2012C <- cover_2012C %>%
   summarise(wts = mean(cover)) 
 ```
 
-Now, we need to merge the species weights with their mean trait values in a single data frame, and we are going to use the column "Taxon" to conect both data frames. But, the two data frames have different column names for the species names as you will see here:
+Now, we need to merge the species weights with their mean trait values in a single data frame, and we are going to use the column "Taxon" to connect both data frames. But, the two data frames have different column names for the species names as you will see here:
 
 ```{r}
 names(spp.wts2012C) # names of the columns or variables
 names(traits.meanvalues) # names of the columns or variables 
 ```
 
-So, first we are going to change the second column name in ssp.wts2012C and call it "Taxon", and after that we can join the two tables.
+So, first we are going to change the second column name in `ssp.wts2012C` and call it "Taxon", and after that we can join the two tables.
 
 ```{r}
 spp.wts2012C <- spp.wts2012C %>%
