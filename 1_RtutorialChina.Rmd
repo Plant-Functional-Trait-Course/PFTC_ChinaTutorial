@@ -65,7 +65,7 @@ source("setup.R")
 ```
 
 ## 3. Load the packages
-```{r Call the libraries, eval=TRUE}
+```{r load_packages, eval=TRUE}
 library("tidyverse")
 library("dataDownloader")
 library("DBI")
