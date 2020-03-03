@@ -42,7 +42,20 @@ First, is important to install all packages needed (1), and check that indeed th
 Here are all the steps to follow. The .R files are scripts with the codes. Open the files if you want to see the instructions (highly recommended).
 
 ```{r Install packages, eval=FALSE}
-source("install_packages.R")
+# Install any missing packages
+
+# # Install packages from CRAN:
+# install.packages("tidyverse")
+# install.packages("vegan")
+# install.packages("RSQLite")
+# install.packages("DBI")
+# install.packages("remotes")
+# install.packages("patchwork")
+# install.packages("osfr")
+# 
+# # Install libraries from GitHub:
+# remotes::install_github("gavinsimpson/ggvegan")
+# remotes::install_github("Between-the-Fjords/dataDownloader")
 ```
 
 ## 2. Check out that everything is updated 
