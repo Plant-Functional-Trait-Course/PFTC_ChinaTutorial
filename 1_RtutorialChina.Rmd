@@ -118,7 +118,7 @@ This script is going to:
   
 1. Read the data from the transplants (transplant.sqlite)
 2. Load cover data and metadata (cover_thin)
-3. Make a fat table (cover) with species names in columns and cover values in each plot
+3. Make a wide table (cover) with species names in columns and cover values in each plot
 4. Make meta data (cover_meta) This are the meta data of the "cover" tibble
 
 We can either source it or run it step by step to see what is doing (preferred option). If you want to run it step by step then open the file.
