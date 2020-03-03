@@ -173,15 +173,14 @@ TraitsSE <- traitsLong %>%
   summarize(N = length(Value), mean = mean(Value), sd = sd(Value), se = sd / sqrt(N))
 ```
 
-Step 2: Make the plot. Define first the position_dodge, this argument allow you to move horizontally the errors bars, so they don´t overlap. Exercise: see what happens if you don´t define the `position_dodge`, or try to change the value.
+Step 2: Make the plot. Define first the `position_dodge`, this argument allow you to move horizontally the errors bars, so they don´t overlap. Exercise: see what happens if you don´t define the `position_dodge`, or try to change the value.
 
 ```{r Plot of the means per trait3, eval=TRUE}
 pd <- position_dodge(0.4)
 
 TraitsSE.p <- ggplot(TraitsSE, aes(x = Site, y = mean,  colour = Treatment)) +
   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = 0.1, position = pd) +
-  geom_line(position = pd) +
-  geom_point(position = pd)+
+  geom_point(position = pd) +
   labs(x = "Site", y = "Mean/se trait value") +
   facet_wrap( ~ Traits, scales = "free") +
   theme(legend.position = "top")
