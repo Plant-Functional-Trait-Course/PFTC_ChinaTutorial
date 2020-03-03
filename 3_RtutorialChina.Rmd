@@ -93,7 +93,7 @@ traitsLong <- traitsLong %>%
   
 TraitDist.plot <- ggplot(traitsLong, aes(x = Value, fill = Site)) +
   geom_density(alpha = 0.5) +
-  scale_fill_brewer(palette = "RdBu", direction = -1, labels=c("High alpine", "Alpine", "Middle", "Lowland")) +
+  scale_fill_brewer(palette = "RdBu", direction = -1, labels = c("High alpine", "Alpine", "Middle", "Lowland")) +
   labs(x = "Mean trait value", y = "Density") +
   facet_wrap( ~ Traits, scales = "free") +
   theme(legend.position = "top")
@@ -136,7 +136,7 @@ Some expamples of scatterplots:
 DryWet <- traitsWideL %>% 
   ggplot(aes(x = Dry_Mass_g.log, y = Wet_Mass_g.log, colour = Site)) +
   geom_point(alpha = 0.4) +
-  scale_color_brewer(palette = "RdBu", direction = -1, labels=c("High alpine", "Alpine", "Middle", "Lowland")) +
+  scale_color_brewer(palette = "RdBu", direction = -1, labels = c("High alpine", "Alpine", "Middle", "Lowland")) +
   theme(legend.position = "right")
 ```
 
@@ -177,7 +177,7 @@ Step 2: Make the plot. Define first the position_dodge, this argument allow you 
 ```{r Plot of the means per trait3, eval=TRUE}
 pd <- position_dodge(0.4)
 
-TraitsSE.p <- ggplot(TraitsSE, aes(x = Site, y = mean,  colour=Treatment)) +
+TraitsSE.p <- ggplot(TraitsSE, aes(x = Site, y = mean,  colour = Treatment)) +
   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = 0.1, position = pd) +
   geom_line(position = pd) +
   geom_point(position = pd)+
@@ -214,8 +214,7 @@ And calculate the mean trait values for each taxon per site. Trait values can be
 traits.meanvalues <- traitsLong %>% 
   filter(!is.na(Value)) %>%
   group_by(Site, Traits, Taxon) %>%
-  summarise(mean = mean(Value)) %>%
-  pivot_wider(names_from = "Traits", values_from = "mean")
+  summarise(mean = mean(Value))
 ```
 
 ##### Calculate the weights
@@ -225,7 +224,7 @@ Subset the cover data, by year and treatment, to include only 2012 and Control p
 ```{r}
 cover_2012C <- cover_thin %>%
   filter(year == "2012") %>% # subset the year
-  filter(TTtreat =="control") %>% # subset the control
+  filter(TTtreat == "control") %>% # subset the control
   select(originSiteID, originPlotID, turfID, TTtreat, year, cover, speciesName) %>%
   mutate(originSiteID = factor(originSiteID, levels = c("L", "M", "A", "H"))) # select only a few variables (we dont need everything)
 ```
@@ -238,7 +237,7 @@ spp.wts2012C <- cover_2012C %>%
   summarise(wts = mean(cover)) 
 ```
 
-Now, we need to merge the species weights with their mean trait values in a single data frame, and we are going to use the column "Taxon" to conect both data frame. But, the two data frames have different column names for the species names as you will see here:
+Now, we need to merge the species weights with their mean trait values in a single data frame, and we are going to use the column "Taxon" to conect both data frames. But, the two data frames have different column names for the species names as you will see here:
 
 ```{r}
 names(spp.wts2012C) # names of the columns or variables
@@ -255,9 +254,6 @@ spp.wts2012C <- spp.wts2012C %>%
 traits.wts <- inner_join(x = spp.wts2012C, y = traits.meanvalues, 
                          by = c("Taxon", "Site")) %>%
     arrange(Site) 
-
-traits.wtsL <- traits.wts %>% 
-  pivot_longer(cols = c("C_percent", "CN_ratio","dC13_percent","dN15_percent", "Dry_Mass_g.log", "LDMC", "Leaf_Area_cm2.log", "Leaf_Thickness_Ave_mm.log", "N_percent", "P_percent", "SLA_cm2_g", "Wet_Mass_g.log"), names_to = "traits", values_to = "value")
 ```
 
 
@@ -266,9 +262,9 @@ There we go:
 Step 1: Summarize the CWM for each trait (but now we also group by year for calculating)
 
 ```{r}
-cwm <- traits.wtsL %>% 
-  group_by(Site, traits) %>% 
-  summarise(wm = weighted.mean(value, wts, na.rm=TRUE))
+cwm <- traits.wts %>% 
+  group_by(Site, Traits) %>% 
+  summarise(wm = weighted.mean(mean, wts, na.rm = TRUE))
 ```
 
 Step 2: Plot
@@ -276,13 +272,10 @@ Step 2: Plot
 ```{r}
 pd <- position_dodge(0.4)
 
-cwm.p <- cwm %>% 
- mutate(traits = factor(traits, levels = c("Wet_Mass_g.log", "Dry_Mass_g.log", "Leaf_Thickness_Ave_mm.log", "Leaf_Area_cm2.log", "SLA_cm2_g", "LDMC", "P_percent", "C_percent", "N_percent", "CN_ratio", "dN15_percent", "dC13_percent"))) 
-  
-cwm.p <- ggplot(cwm.p, aes(x = Site, y = wm)) +
+cwm.p <- ggplot(cwm, aes(x = Site, y = wm)) +
  geom_point(position = pd, shape = 17) +
  labs(x = "Site", y = "CWM", title = "Control plots 2012") +
- facet_wrap( ~ traits, scales = "free") +
+ facet_wrap( ~ Traits, scales = "free") +
  theme(legend.position = "top", plot.title = element_text(size = (15))) 
 
 cwm.p
