@@ -18,27 +18,15 @@ if(Sys.which("git") == ""){
 
 
 # Check CRAN packages installed
-CRAN_needed <- read.table(header = TRUE, stringsAsFactors = FALSE, text = 
-                            "package
-                          tidyverse #this includes dplyr, ggplot, tidyr etc
-                          vegan
-                          RSQLite
-                          DBI
-                          devtools
-                          patchwork
-                          gridExtra
-                          rmarkdown
-                          osfr")$package
-
-#assertthat
-#assertr
-#GGally
-#ggfortify
-#entropy
-#cocorresp
-#ggrepel
-#rdrop2
-#raster
+CRAN_needed <- c(
+  "tidyverse", #this includes dplyr, ggplot, tidyr etc
+  "vegan",
+  "RSQLite",
+  "DBI",
+  "remotes",
+  "patchwork",
+  "assertthat",
+  "rmarkdown")
 
 # check against currently installed packages
 installed_packages <- .packages(all.available = TRUE)
