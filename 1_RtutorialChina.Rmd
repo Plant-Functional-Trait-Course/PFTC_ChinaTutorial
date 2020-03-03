@@ -37,7 +37,7 @@ knitr::include_graphics('./map/ChinaMountain.jpg')
 
 ## 1. Install packages
 
-First, is important to install all packages needed (1), and check that indeed they are installed (2), call these libraries (3) and download the data to the correct folders.
+First, is important to install all packages needed (1), and check that indeed they are installed (2), load these packages,(3) and download the data to the correct folders.
 
 Here are all the steps to follow. The .R files are scripts with the codes. Open the files if you want to see the instructions (highly recommended).
 
