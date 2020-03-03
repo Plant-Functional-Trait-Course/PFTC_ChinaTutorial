@@ -28,12 +28,8 @@ library("ggvegan")
 library("patchwork")
 ```
 
-```{r Download the data, include=FALSE}
-source("instructions_to_download.R")
-```
-
 ```{r Read cover and composition data, include=FALSE}
-source("start_here.R")
+source("hidden/start_here.R")
 ```
 
 ```{r Read trait data, include=FALSE}
@@ -50,9 +46,10 @@ traitsChem <- read_csv(file = "traits/data/PFTC1.2_China_2015_2016_ChemicalTrait
 
 cover_thin is an object that contains community data (cover data and composition of each turb and treatment). 
 
-Explore the columns names in cover_thin:
+Explore the columns names in cover_thin, "head" is more informative. Use whatever you prefer:
 ```{r Exploring how the data are organized, eval=FALSE}
 colnames(cover_thin)
+head(cover_thin)
 ```
 
 cover is a summary of the total cover of each species in cover_thin
