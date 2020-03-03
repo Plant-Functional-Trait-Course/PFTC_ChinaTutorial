@@ -2,7 +2,7 @@
 # Run this script first to check required packages installed 
 
 # Check recent version of R installed
-if(getRversion() < "3.3.2") {
+if(getRversion() < "3.6.1") {
   stop("##########\nOld version of R\nPlease install latest version\n##########")
 }
 
@@ -20,23 +20,25 @@ if(Sys.which("git") == ""){
 # Check CRAN packages installed
 CRAN_needed <- read.table(header = TRUE, stringsAsFactors = FALSE, text = 
                             "package
-                          tidyverse #this includes dplyr,                             ggplot, tidyr etc
+                          tidyverse #this includes dplyr, ggplot, tidyr etc
                           vegan
                           RSQLite
-                          assertthat
+                          DBI
                           devtools
                           patchwork
                           gridExtra
                           rmarkdown
-                          assertr
-                          GGally
-                          ggfortify
-                          entropy
-                          cocorresp
-                          ggrepel
-                          rdrop2
-                          raster
-                          ")$package
+                          osfr")$package
+
+#assertthat
+#assertr
+#GGally
+#ggfortify
+#entropy
+#cocorresp
+#ggrepel
+#rdrop2
+#raster
 
 # check against currently installed packages
 installed_packages <- .packages(all.available = TRUE)
@@ -50,10 +52,7 @@ if(length(CRAN_needed2) > 0){
 # check github packages
 github_needed <- read.table(header = TRUE, stringsAsFactors = FALSE, text =
    "package repo ref
-   ggbiplot richardjtelford experimental
    ggvegan gavinsimpson master
-   tpldata gustavobio master
-   tpl gustavobio master
    dataDownloader Between-the-Fjords master")
 
 # check all packages downloaded 
