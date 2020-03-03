@@ -12,7 +12,7 @@ sapply(fl, source)
 
 # make database connection
 #
-con <- src_sqlite(path = paste0(path, "/data/transplant.sqlite"), create = FALSE)
+con <- src_sqlite(path = "community/data/transplant.sqlite", create = FALSE)
 
 #load cover data and metadata
 cover_thin <- load_comm(con = con)
