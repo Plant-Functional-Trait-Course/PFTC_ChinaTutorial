@@ -21,9 +21,10 @@ knitr::opts_chunk$set(
 
 # TRANSPLANT EXPERIMENT GONGGA MOUNTAIN (CHINA)
 
-This is an R tutorial for working with the Transplant Experiment data in Gongga Mountain, China. The purpose of the tutorial is to be able to download the data, read them and understand their structure prior to "play" with them.
+This is an R tutorial for working with the Transplant Experiment data in Gongga Mountain, China. The purpose of the tutorial is to be able to download the data, read them and understand their structure before playing with them.
 
 ## STUDY AND SITE INFORMATION
+
 The transplant study is located in the Gongga Mountains in Sichuan Province, south-west China. The study contains four sites spanning from 3000 to 4130 m a.s.l. along an elevational gradient. The vegetation ranges from coniferous-broadleaved forest to alpine meadows.
 
 ```{r echo=FALSE, out.width='60%', fig.cap= "Location of the four study sites along an elevational gradient. Inset indicates the locations of the study sites in China."}
@@ -34,21 +35,21 @@ knitr::include_graphics('./map/TransplantMap.png')
 knitr::include_graphics('./map/ChinaMountain.jpg')
 ```
 
-## 1. Install the libraries
+## 1. Install packages
 
-First, is important to install all the libraries needed (1), check that indeed we have all the library needed installed (2), call these libraries (3) and download the data to the correct folders.
+First, is important to install all packages needed (1), and check that indeed they are installed (2), call these libraries (3) and download the data to the correct folders.
 
 Here are all the steps to follow. The .R files are scripts with the codes. Open the files if you want to see the instructions (highly recommended).
 
-```{r Install the libraries, eval=FALSE}
+```{r Install packages, eval=FALSE}
 source("install_packages.R")
 ```
 
-## 2. Check out if everything is updated 
+## 2. Check out that everything is updated 
  
- Check R version and libraries
+Check R version and libraries
  
-```{r Check out if everything is updated, eval=FALSE}
+```{r Check out that everything is updated, eval=FALSE}
 source("setup.R")
 ```
 
@@ -64,19 +65,52 @@ library("patchwork")
 
 ## 4. Download the data
 
-I think it is important for you to inspect this file "instructions_to_download.R"
+Download the data and store it in the proper files
+
 ```{r Download the data, eval=TRUE}
-source("instructions_to_download.R")
+# Instructions to download the Data
+# load packages
+library("osfr")
+library("dataDownloader")
+# Location of PFTC Data
+# The data are located in OSF repository
+# To know the exact location of each PFTC Data check this file:
+# https://docs.google.com/spreadsheets/d/1y81Xv33BaoWV2FNx0F9XbikjKeHLGNxfmWZ2w4xmISk/edit#gid=0
+
+## COMMUNITY DATA
+path <- "community/"
+if(!exists("path")) {
+  path <- ""
+}
+
+# China community data from the transplants:
+get_file(node = "4hjzu",
+         file = "transplant.sqlite",
+         path = "community/data")
+
+## TRAIT DATA
+path <- "traits/"
+if(!exists("path")) {
+  path <- ""
+}
+# China traits: Leaf traits
+get_file(node = "emzgf",
+         file = "PFTC1.2_China_2015_2016_LeafTraits.csv",
+         path = "traits/data")
+# China traits: Chemical traits
+get_file(node = "emzgf",
+         file = "PFTC1.2_China_2015_2016_ChemicalTraits.csv",
+         path = "traits/data")
 ```
 
 ## 5. Read the data
 
 ### Cover and composition data
 
-The script to read and process the cover data is here:
+The script to read and process the cover data is in "hidden" folder:
 
 ```{r Cover and composition data, eval=TRUE}
-source("start_here.R")
+source("hidden/start_here.R")
 ```
 
 This script is going to:
