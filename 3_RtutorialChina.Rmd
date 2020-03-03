@@ -64,16 +64,17 @@ traitsLongC <- traitsChem %>%
                names_to = "Traits", values_to = "Value")
 ```
 
-Step 4: Bind the two data sets (Leaf and Chemical traits), using the two "long" tables, and transform the Site variable variable to a factor, with four levels ("L", "M", "A", "H").
+Step 4: Bind the two data sets (Leaf and Chemical traits), using the two "long" tables, and transform the Site variable variable to a factor, with four levels ("Lowland", "Middle", "Alpine", "High alpine").
 
 ```{r Data wrangling5, eval=TRUE}
-traitsLong <- traitsLongL %>% bind_rows(traitsLongC) %>% 
-  mutate(Site = factor(Site, levels = c("L", "M", "A", "H")))
+traitsLong <- traitsLongL %>% 
+  bind_rows(traitsLongC) %>% 
+  mutate(Site = factor(Site, levels = c("L", "M", "A", "H"), labels = c("Lowland", "Middle", "Alpine", "High alpine")))
 ```
 
 A short note:
 
-Reasons for mutating character names into a factor (or why sometimes is better to use factor instead of character in R): This is not 100% necessary and you can load the upcoming codes without mutating the Traits names into a factor, so no worries too much about this lines. But here is the explanation. In case you are working with categorical data (predefined, finite number of values) is generally better to use factors instead of character. Although factors look like as character vectors they are integers in their "heart". They are stored in alphabetical order or we can define a meaningful order (as we did with Site or will do with the Traits names). When defined in a particular order you are forcing the order of facets, or the order of labels, etc... in plots. Compared to simple integers (1,2,3,4), factors are "self-describing" ("L","M","A","H").
+Reasons for mutating character names into a factor (or why sometimes is better to use factor instead of character in R): This is not 100% necessary and you can load the upcoming codes without mutating the Traits names into a factor, so no worries too much about this lines. But here is the explanation. In case you are working with categorical data (predefined, finite number of values) is generally better to use factors instead of character. Although factors look like as character vectors they are integers in their "heart". They are stored in alphabetical order or we can define a meaningful order (as we did with Site or will do with the Traits names). When defined in a particular order you are forcing the order of facets, or the order of labels, etc... in plots. Compared to simple integers (1,2,3,4), factors are "self-describing".
 
 #### Density plot
 
@@ -93,7 +94,7 @@ traitsLong <- traitsLong %>%
   
 TraitDist.plot <- ggplot(traitsLong, aes(x = Value, fill = Site)) +
   geom_density(alpha = 0.5) +
-  scale_fill_brewer(palette = "RdBu", direction = -1, labels = c("High alpine", "Alpine", "Middle", "Lowland")) +
+  scale_fill_brewer(palette = "RdBu") +
   labs(x = "Mean trait value", y = "Density") +
   facet_wrap( ~ Traits, scales = "free") +
   theme(legend.position = "top")
@@ -112,7 +113,7 @@ A different way of displaying the distribution of the data is using boxplots. Bo
 ```{r Boxplots, eval=TRUE}
 TraitBoxp.plot <- ggplot(traitsLong, aes(x = Site, y = Value, fill = Site)) +
  geom_boxplot() +
- scale_fill_brewer(palette = "RdBu", direction = -1, labels = c("High alpine", "Alpine", "Middle", "Lowland")) +
+ scale_fill_brewer(palette = "RdBu") +
   facet_wrap( ~ Traits, scales = "free") +
   theme(legend.position = "top")
 
@@ -172,7 +173,7 @@ TraitsSE <- traitsLong %>%
   summarize(N = length(Value), mean = mean(Value), sd = sd(Value), se = sd / sqrt(N))
 ```
 
-Step 2: Make the plot. Define first the position_dodge, this argument allow you to move horizontally the errors bars, so they don´t overlap. Exercise: see what happens if you don´t define the position_dodge, or try to change the value.
+Step 2: Make the plot. Define first the position_dodge, this argument allow you to move horizontally the errors bars, so they don´t overlap. Exercise: see what happens if you don´t define the `position_dodge`, or try to change the value.
 
 ```{r Plot of the means per trait3, eval=TRUE}
 pd <- position_dodge(0.4)
@@ -226,7 +227,8 @@ cover_2012C <- cover_thin %>%
   filter(year == "2012") %>% # subset the year
   filter(TTtreat == "control") %>% # subset the control
   select(originSiteID, originPlotID, turfID, TTtreat, year, cover, speciesName) %>%
-  mutate(originSiteID = factor(originSiteID, levels = c("L", "M", "A", "H"))) # select only a few variables (we dont need everything)
+  mutate(originSiteID = factor(originSiteID, levels = c("L", "M", "A", "H"),
+                               labels = c("Lowland", "Middle", "Alpine", "High alpine"))) # select only a few variables (we dont need everything)
 ```
 
 Now, calculate the species weights based on mean cover of each species at each site in 2012 in the Control plots. Just a mean of the cover per site for each species!
