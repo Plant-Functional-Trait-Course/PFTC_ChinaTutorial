@@ -36,15 +36,14 @@ First, you can see that Site is stored as "character".
 mode(traitsLeaf$Site)
 ```
 
-Step 1: For plotting purposes is better to transform this variable to a factor, with four levels ("L", "M", "A", "H"). We will also log transform the traits, this will help to reduce the skewness of the values and to make the relationships between traits clearer.
+Step 1:  We will log transform the traits, this will help to reduce the skewness of the values and to make the relationships between traits clearer.
 
 ```{r Data wrangling2, eval=TRUE}
 traitsWideL <- traitsLeaf %>% 
   mutate(Wet_Mass_g.log = log(Wet_Mass_g),
          Dry_Mass_g.log = log(Dry_Mass_g),
          Leaf_Thickness_Ave_mm.log = log(Leaf_Thickness_Ave_mm),
-         Leaf_Area_cm2.log = log(Leaf_Area_cm2)) %>% 
-  mutate(Site = factor(Site, levels = c("L", "M", "A", "H"))) 
+         Leaf_Area_cm2.log = log(Leaf_Area_cm2)) 
 ```
 
 Step 2: New format to the leaf traits data, with traits and values in two columns: 
@@ -62,20 +61,14 @@ Step 3: New format to the leaf Chemical traits (same manner). These values are p
 traitsLongC <- traitsChem %>% 
   select(Date, Elevation, Site, Treatment, Taxon, P_percent, C_percent, N_percent, CN_ratio, dN15_percent, dC13_percent) %>% 
   pivot_longer(cols = c("P_percent", "C_percent","N_percent", "CN_ratio", "dN15_percent", "dC13_percent"), 
-               names_to="Traits", values_to = "Value")
+               names_to = "Traits", values_to = "Value")
 ```
 
-Step 4: Bind the two data sets (Leaf and Chemical traits), using the two "long" tables:
+Step 4: Bind the two data sets (Leaf and Chemical traits), using the two "long" tables, and transform the Site variable variable to a factor, with four levels ("L", "M", "A", "H").
 
 ```{r Data wrangling5, eval=TRUE}
-traitsLong <- traitsLongL %>% bind_rows(traitsLongC)
-```
-
-Make the Site a factor instead of a character, and order the levels from L to H (upslope)
-
-```{r Data wrangling6, eval=TRUE}
-traitsLong <- traitsLong %>% 
-  mutate(Site = factor(Site, levels = c("L", "M", "A", "H"))) 
+traitsLong <- traitsLongL %>% bind_rows(traitsLongC) %>% 
+  mutate(Site = factor(Site, levels = c("L", "M", "A", "H")))
 ```
 
 A short note:
