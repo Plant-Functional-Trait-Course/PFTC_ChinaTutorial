@@ -36,7 +36,7 @@ First, you can see that Site is stored as "character".
 mode(traitsLeaf$Site)
 ```
 
-Step 1: For plotting purpuses is better to transform this variable to a factor, with four levels ("L", "M", "A", "H"). We will also log transform the traits, this will help to reduce the skewness of the values and to make the relationships between traits clearer.
+Step 1: For plotting purposes is better to transform this variable to a factor, with four levels ("L", "M", "A", "H"). We will also log transform the traits, this will help to reduce the skewness of the values and to make the relationships between traits clearer.
 
 ```{r Data wrangling2, eval=TRUE}
 traitsWideL <- traitsLeaf %>% 
@@ -52,7 +52,8 @@ Step 2: New format to the leaf traits data, with traits and values in two column
 ```{r Data wrangling3, eval=TRUE}
 traitsLongL <- traitsWideL %>% 
   select(Date, Elevation, Site, Treatment, Taxon, Individual_number, Leaf_number, Wet_Mass_g.log, Dry_Mass_g.log, Leaf_Thickness_Ave_mm.log, Leaf_Area_cm2.log, SLA_cm2_g, LDMC) %>% 
-  pivot_longer(cols=c("Wet_Mass_g.log", "Dry_Mass_g.log", "Leaf_Thickness_Ave_mm.log", "Leaf_Area_cm2.log", "SLA_cm2_g", "LDMC"), names_to="Traits", values_to = "Value")
+  pivot_longer(cols = c("Wet_Mass_g.log", "Dry_Mass_g.log", "Leaf_Thickness_Ave_mm.log", "Leaf_Area_cm2.log", "SLA_cm2_g", "LDMC"), 
+               names_to = "Traits", values_to = "Value")
 ```
 
 Step 3: New format to the leaf Chemical traits (same manner). These values are percentage, so we don´t need to log transform these traits:
@@ -60,7 +61,8 @@ Step 3: New format to the leaf Chemical traits (same manner). These values are p
 ```{r Data wrangling4, eval=TRUE}
 traitsLongC <- traitsChem %>% 
   select(Date, Elevation, Site, Treatment, Taxon, P_percent, C_percent, N_percent, CN_ratio, dN15_percent, dC13_percent) %>% 
-  pivot_longer(cols=c("P_percent", "C_percent","N_percent", "CN_ratio", "dN15_percent", "dC13_percent"), names_to="Traits", values_to = "Value")
+  pivot_longer(cols = c("P_percent", "C_percent","N_percent", "CN_ratio", "dN15_percent", "dC13_percent"), 
+               names_to="Traits", values_to = "Value")
 ```
 
 Step 4: Bind the two data sets (Leaf and Chemical traits), using the two "long" tables:
@@ -70,6 +72,7 @@ traitsLong <- traitsLongL %>% bind_rows(traitsLongC)
 ```
 
 Make the Site a factor instead of a character, and order the levels from L to H (upslope)
+
 ```{r Data wrangling6, eval=TRUE}
 traitsLong <- traitsLong %>% 
   mutate(Site = factor(Site, levels = c("L", "M", "A", "H"))) 
@@ -77,7 +80,7 @@ traitsLong <- traitsLong %>%
 
 A short note:
 
-Reasons for mutating character names into a factor (or why sometimes is better to use factor instead of character in R): This is not 100% neccesary and you can load the upcomming codes without mutating the Traits names into a factor, so no worries too much about this lines. But here is the explanation. In case you are working with categorical data (predifined, finite number of values) is generally better to use factors instead of character. Although factors look like as character vectors they are integers in their "heart". They are stored in alphabetical order or we can define a meaningfull order (as we did with Site or will do with the Traits names). When defined in a particular order you are forcing the order of facets, or the order of labels, etc... in plots. Compared to simple integers (1,2,3,4), factors are "self-describing" ("L","M","A","H").
+Reasons for mutating character names into a factor (or why sometimes is better to use factor instead of character in R): This is not 100% neccesary and you can load the upcomming codes without mutating the Traits names into a factor, so no worries too much about this lines. But here is the explanation. In case you are working with categorical data (predefined, finite number of values) is generally better to use factors instead of character. Although factors look like as character vectors they are integers in their "heart". They are stored in alphabetical order or we can define a meaningfull order (as we did with Site or will do with the Traits names). When defined in a particular order you are forcing the order of facets, or the order of labels, etc... in plots. Compared to simple integers (1,2,3,4), factors are "self-describing" ("L","M","A","H").
 
 #### Density plot
 
