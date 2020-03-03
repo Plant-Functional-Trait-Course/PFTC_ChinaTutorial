@@ -37,34 +37,9 @@ knitr::include_graphics('./map/ChinaMountain.jpg')
 
 ## 1. Install packages
 
-First, is important to install all packages needed (1), and check that indeed they are installed (2), load these packages,(3) and download the data to the correct folders.
+First, is important to install all packages needed. The code in the file "setup.R" will do this and check you have a recent version of R.
 
-Here are all the steps to follow. The .R files are scripts with the codes. Open the files if you want to see the instructions (highly recommended).
-
-```{r Install packages, eval=FALSE}
-# Install any missing packages - uncomment here or use install_packages.R script
-
-# # Install packages from CRAN:
-# install.packages("tidyverse")
-# install.packages("vegan")
-# install.packages("RSQLite")
-# install.packages("remotes")
-# install.packages("patchwork")
-# 
-# # Install libraries from GitHub:
-# remotes::install_github("gavinsimpson/ggvegan", upgrade = FALSE)
-# remotes::install_github("Between-the-Fjords/dataDownloader", upgrade = FALSE)
-```
-
-## 2. Check out that everything is updated 
- 
-Check R version and libraries
- 
-```{r Check out that everything is updated, eval=FALSE}
-source("setup.R")
-```
-
-## 3. Load the packages
+## 2. Load the packages
 ```{r load_packages, eval=TRUE}
 library("tidyverse")
 library("dataDownloader")
@@ -74,7 +49,7 @@ library("ggvegan")
 library("patchwork")
 ```
 
-## 4. Download the data
+## 3. Download the data
 
 Download the data and store it in the proper files
 
@@ -104,7 +79,7 @@ get_file(node = "emzgf",
          path = "traits/data")
 ```
 
-## 5. Read the data
+## 4. Read the data
 
 ### Cover and composition data
 
