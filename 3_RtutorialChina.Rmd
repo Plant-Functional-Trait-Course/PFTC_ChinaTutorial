@@ -79,7 +79,7 @@ Reasons for mutating character names into a factor (or why sometimes is better t
 
 Here is the code to plot the traits distributions, using density plots. A density plot is similar to an histogram, and allows visualizing the distribution of a numerical variable (it shows the interval and the peaks of the distribution). The peaks of a density plot show where the values are concentrated over the interval.
 
-We want to plot the distribution of each invidual trait, at each site, to visualize their variation. So, first we filter the values containing NA´s, since we are not interested in that and transform the Traits names into a factor (they are stored as character). Then, we plot it using ggplot. The values of each trait are going to appear in the x coordinate (Value) and their frequency in coordinate y. Density curves appear on different colors based on the Site (fill=Site).
+We want to plot the distribution of each invidual trait, at each site, to visualize their variation. So, first we `filter` the values containing NA´s, since we are not interested in that and transform the Traits names into a factor (they are stored as character). Then, we plot it using `ggplot`. The values of each trait are going to appear in the x coordinate (Value) and their frequency in coordinate y. Density curves appear on different colors based on the Site (`fill = Site`).
 
 `geom_density(alpha = 0.5)´ argument simply fills the density curves with a transparent color.
 
@@ -88,14 +88,15 @@ We want to plot the distribution of each invidual trait, at each site, to visual
 ```{r Density plot, eval=TRUE}
 TraitDist <- traitsLong %>% 
   filter(!is.na(Value)) %>% 
-  mutate(Traits = factor(Traits, levels = c("Wet_Mass_g.log", "Dry_Mass_g.log", "Leaf_Thickness_Ave_mm.log", "Leaf_Area_cm2.log", "SLA_cm2_g", "LDMC", "P_percent", "C_percent", "N_percent", "CN_ratio", "dN15_percent", "dC13_percent"))) # if you don´t understand why we are mutating Traits into a factor, you can just remove the last part of this code. It won´t make a huge difference.
+  mutate(Traits = factor(Traits, 
+                         levels = c("Wet_Mass_g.log", "Dry_Mass_g.log", "Leaf_Thickness_Ave_mm.log", "Leaf_Area_cm2.log", "SLA_cm2_g", "LDMC", "P_percent", "C_percent", "N_percent", "CN_ratio", "dN15_percent", "dC13_percent")))
   
 TraitDist.plot <- ggplot(TraitDist, aes(x = Value, fill = Site)) +
   geom_density(alpha = 0.5) +
   scale_fill_brewer(palette = "RdBu", direction = -1, labels=c("High alpine", "Alpine", "Middle", "Lowland")) +
   labs(x = "Mean trait value", y = "Density") +
   facet_wrap( ~ Traits, scales = "free") +
-  theme(legend.position="top")
+  theme(legend.position = "top")
 
 TraitDist.plot
 ```
@@ -109,11 +110,11 @@ Try to plot the same density plot, but using only the values of one of the treat
 A different way of displaying the distribution of the data is using boxplots. Boxplots are a graph showing how the values are spread out, similarly to the density plots. Sometimes boxplots are more informative that other measures of central tendencies like the mean. We are using here the object TraitDist, defined before.
 
 ```{r Boxplots, eval=TRUE}
-TraitBoxp.plot <- ggplot(TraitDist, aes(x=Site, y = Value, fill = Site)) +
+TraitBoxp.plot <- ggplot(TraitDist, aes(x = Site, y = Value, fill = Site)) +
  geom_boxplot() +
- scale_fill_brewer(palette = "RdBu", direction = -1, labels=c("High alpine", "Alpine", "Middle", "Lowland")) +
+ scale_fill_brewer(palette = "RdBu", direction = -1, labels = c("High alpine", "Alpine", "Middle", "Lowland")) +
   facet_wrap( ~ Traits, scales = "free") +
-  theme(legend.position="top")
+  theme(legend.position = "top")
 
 TraitBoxp.plot
 ```
@@ -139,13 +140,14 @@ DryWet <- traitsWideL %>%
   theme(legend.position = "right")
 ```
 
+If we want to plot different variables, we can just change the aesthetics rather that rewriting the entire plotting code. 
 ```{r Traits scatterplots2, eval=TRUE}
 DryArea <- DryWet + aes(x = Dry_Mass_g.log, y = Leaf_Area_cm2.log) 
 AreaSLA <- DryWet + aes(x = Leaf_Area_cm2, y = SLA_cm2_g)
 LDMCThick <- DryWet + aes(x = LDMC, y = Leaf_Thickness_Ave_mm) 
 ```
 
-We are going to plot all the scatterplots together using the "patchwork" package.
+We are going to plot all the scatterplots together using the `patchwork` package.
 ```{r Traits scatterplots3, eval=TRUE}
 DryWet + DryArea + AreaSLA + LDMCThick + plot_layout(guides = "collect") 
 ```
@@ -165,7 +167,7 @@ I have excluded the values of "outexp" (data from outside the experimental turfs
 ```{r Plot of the means per trait2, eval=TRUE}
 TraitsSE <- traitsLong %>% 
   filter(!is.na(Value)) %>%
-  filter(Treatment!= "outexp") %>%
+  filter(Treatment != "outexp") %>%
   group_by(Site, Treatment, Traits) %>%
   summarize(N = length(Value), mean = mean(Value), sd = sd(Value), se = sd / sqrt(N))
 ```
@@ -175,13 +177,13 @@ Step 2: Make the plot. Define first the position_dodge, this argument allow you 
 ```{r Plot of the means per trait3, eval=TRUE}
 pd <- position_dodge(0.4)
 
-TraitsSE.p <- ggplot(TraitsSE, aes(x = Site, y=mean,  colour=Treatment)) +
-  geom_errorbar(aes(ymin=mean-se, ymax=mean+se), width=.1, position=pd) +
-  geom_line(position=pd) +
-  geom_point(position=pd)+
+TraitsSE.p <- ggplot(TraitsSE, aes(x = Site, y = mean,  colour=Treatment)) +
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = 0.1, position = pd) +
+  geom_line(position = pd) +
+  geom_point(position = pd)+
   labs(x = "Site", y = "Mean/se trait value") +
   facet_wrap( ~ Traits, scales = "free") +
-  theme(legend.position="top")
+  theme(legend.position = "top")
 
 TraitsSE.p 
 ```
