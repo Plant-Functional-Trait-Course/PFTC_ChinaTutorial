@@ -272,10 +272,8 @@ cwm <- traits.wts %>%
 Step 2: Plot
 
 ```{r}
-pd <- position_dodge(0.4)
-
 cwm.p <- ggplot(cwm, aes(x = Site, y = wm)) +
- geom_point(position = pd, shape = 17) +
+ geom_point(shape = 17) +
  labs(x = "Site", y = "CWM", title = "Control plots 2012") +
  facet_wrap( ~ Traits, scales = "free") +
  theme(legend.position = "top", plot.title = element_text(size = (15))) 
