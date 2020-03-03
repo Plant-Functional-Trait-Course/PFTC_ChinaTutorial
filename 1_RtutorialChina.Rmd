@@ -128,9 +128,9 @@ We can either source it or run it step by step to see what is doing (preferred o
 The traits data are located in China/traits/data, in two files: LeafTraits and ChemicalTraits. 
                                                             To read the csv files:
 ```{r Trait data, eval=TRUE}
-traitsLeaf <- read_csv(file = "traits/data/PFTC1.2_China_2015_2016_LeafTraits.csv", col_names = TRUE)
+traitsLeaf <- read_csv(file = "traits/data/PFTC1.2_China_2015_2016_LeafTraits.csv")
 
-traitsChem <- read_csv(file = "traits/data/PFTC1.2_China_2015_2016_ChemicalTraits.csv", col_names = TRUE)
+traitsChem <- read_csv(file = "traits/data/PFTC1.2_China_2015_2016_ChemicalTraits.csv")
 ```
                                                                                                                  
                 
