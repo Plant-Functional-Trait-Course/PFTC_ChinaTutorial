@@ -48,7 +48,7 @@ traitsChem <- read_csv(file = "traits/data/PFTC1.2_China_2015_2016_ChemicalTrait
 
 ### Cover and composition data
 
-`cover_thin` is an object that contains community data (cover data and composition of each turb and treatment). 
+`cover_thin` is an object that contains community data (cover data and composition of each turf and treatment). 
 
 Explore the columns names in `cover_thin`, `head()` is more informative. Use whatever you prefer:
 ```{r Exploring how the data are organized, eval=FALSE}
