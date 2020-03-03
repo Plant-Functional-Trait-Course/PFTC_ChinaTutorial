@@ -215,7 +215,7 @@ traits.meanvalues <- traitsLong %>%
   filter(!is.na(Value)) %>%
   group_by(Site, Traits, Taxon) %>%
   summarise(mean = mean(Value)) %>%
-  spread(key = Traits, value = mean)
+  pivot_wider(names_from = "Traits", values_from = "mean")
 ```
 
 ##### Calculate the weights
