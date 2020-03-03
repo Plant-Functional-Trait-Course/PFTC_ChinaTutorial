@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r, include=FALSE}
-source("starter.R")
+source("hidden/starter.R")
 ```
 
 ### Trait Distributions
@@ -77,8 +77,7 @@ traitsLong <- traitsLong %>%
 
 A short note:
 
-Reasons for mutating character names into a factor (or why sometimes is better to use factor instead of character in R): This is not 100% neccesary and you can load the upcomming codes without mutating the Traits names into a factor, so no worries too much about this lines. But here is the explanation. Factors are stored as numbers (integers) and have labels associated with these unique numbers (the values or names you assigned) and a table of levels. This saves a lot of memory compared to character. In case you are working with categorical data (predifined, finite number of values) is generally better to use factors instead of character. Although factors look like as character vectors they are integers in their "heart". They are stored in alphabetical order or we can define a meaningfull order (as we did with Site or will do with the Traits names). Compared to simple integers (1,2,3,4), factors are "self-describing" ("L","M","A","H").
-
+Reasons for mutating character names into a factor (or why sometimes is better to use factor instead of character in R): This is not 100% neccesary and you can load the upcomming codes without mutating the Traits names into a factor, so no worries too much about this lines. But here is the explanation. In case you are working with categorical data (predifined, finite number of values) is generally better to use factors instead of character. Although factors look like as character vectors they are integers in their "heart". They are stored in alphabetical order or we can define a meaningfull order (as we did with Site or will do with the Traits names). When defined in a particular order you are forcing the order of facets, or the order of labels, etc... in plots. Compared to simple integers (1,2,3,4), factors are "self-describing" ("L","M","A","H").
 
 #### Density plot
 
@@ -141,18 +140,18 @@ DryWet <- traitsWideL %>%
   ggplot(aes(x = Dry_Mass_g.log, y = Wet_Mass_g.log, colour = Site)) +
   geom_point(alpha = 0.4) +
   scale_color_brewer(palette = "RdBu", direction = -1, labels=c("High alpine", "Alpine", "Middle", "Lowland")) +
-  theme(legend.position = "none")
+  theme(legend.position = "right")
 ```
 
 ```{r Traits scatterplots2, eval=TRUE}
-DryArea <- DryWet + aes(x = Dry_Mass_g.log, y = Leaf_Area_cm2.log) +
-  theme(legend.position = "right")
+DryArea <- DryWet + aes(x = Dry_Mass_g.log, y = Leaf_Area_cm2.log) 
 AreaSLA <- DryWet + aes(x = Leaf_Area_cm2, y = SLA_cm2_g)
 LDMCThick <- DryWet + aes(x = LDMC, y = Leaf_Thickness_Ave_mm) 
 ```
 
+We are going to plot all the scatterplots together using the "patchwork" package.
 ```{r Traits scatterplots3, eval=TRUE}
-DryWet + DryArea + AreaSLA + LDMCThick
+DryWet + DryArea + AreaSLA + LDMCThick + plot_layout(guides = "collect") 
 ```
 
 ### Traits means
@@ -206,8 +205,7 @@ For the traits calculations we are going to use traitsLong, you can check how we
 
 ```{r}
 traitsLong <- traitsLong %>%
-  select(Site, Treatment, Taxon, Traits, Value) %>%
-  mutate(Site= factor(Site, levels=c("L", "M", "A","H")))
+  select(Site, Treatment, Taxon, Traits, Value) 
 ```
 
 ##### Calculate mean trait values
@@ -228,9 +226,10 @@ Subset the cover data, by year and treatment, to include only 2012 and Control p
 
 ```{r}
 cover_2012C <- cover_thin %>%
-  filter(year == "2012")%>% # subset the year
-  filter(TTtreat =="control")%>% # subset the control
-  select(originSiteID, originPlotID, turfID, TTtreat, year, cover, speciesName) # select only a few variables (we dont need everything)
+  filter(year == "2012") %>% # subset the year
+  filter(TTtreat =="control") %>% # subset the control
+  select(originSiteID, originPlotID, turfID, TTtreat, year, cover, speciesName) %>%
+  mutate(originSiteID = factor(originSiteID, levels = c("L", "M", "A", "H"))) # select only a few variables (we dont need everything)
 ```
 
 Now, calculate the species weights based on mean cover of each species at each site in 2012 in the Control plots. Just a mean of the cover per site for each species!
@@ -238,7 +237,7 @@ Now, calculate the species weights based on mean cover of each species at each s
 ```{r}
 spp.wts2012C <- cover_2012C %>% 
   group_by(originSiteID, speciesName) %>%
-  summarise(wts = mean(cover))
+  summarise(wts = mean(cover)) 
 ```
 
 Now, we need to merge the species weights with their mean trait values in a single data frame, and we are going to use the column "Taxon" to conect both data frame. But, the two data frames have different column names for the species names as you will see here:
@@ -251,17 +250,17 @@ names(traits.meanvalues) # names of the columns or variables
 So, first we are going to change the second column name in ssp.wts2012C and call it "Taxon", and after that we can join the two tables.
 
 ```{r}
-spp.wts2012C <- rename(spp.wts2012C, Taxon=speciesName)
-spp.wts2012C <- rename(spp.wts2012C, Site=originSiteID)
+spp.wts2012C <- spp.wts2012C %>%
+  rename(Taxon=speciesName,Site=originSiteID)
 
 # and then merge:
-traits.wts <- merge(spp.wts2012C, traits.meanvalues, by=c("Taxon", "Site")) %>%
-    arrange(Site)%>%
-  mutate(Site= factor(Site, levels=c("L", "M", "A","H")))
+traits.wts <- inner_join(x=spp.wts2012C, y=traits.meanvalues, by=c("Taxon", "Site")) %>%
+    arrange(Site) 
 
 traits.wtsL <- traits.wts %>% 
 pivot_longer(cols = c("C_percent", "CN_ratio","dC13_percent","dN15_percent", "Dry_Mass_g.log", "LDMC", "Leaf_Area_cm2.log", "Leaf_Thickness_Ave_mm.log", "N_percent", "P_percent", "SLA_cm2_g", "Wet_Mass_g.log"), names_to = "traits", values_to = "value")
 ```
+
 
 There we go:
 
@@ -281,8 +280,6 @@ pd <- position_dodge(0.4)
 cwm.p <- cwm %>% 
  mutate(traits = factor(traits, levels = c("Wet_Mass_g.log", "Dry_Mass_g.log", "Leaf_Thickness_Ave_mm.log", "Leaf_Area_cm2.log", "SLA_cm2_g", "LDMC", "P_percent", "C_percent", "N_percent", "CN_ratio", "dN15_percent", "dC13_percent"))) 
   
-cwm.p = as.data.frame(cwm.p) #transform to a data frame
-
 cwm.p <- ggplot(cwm.p, aes(x = Site, y= wm)) +
  geom_point(position=pd, shape=17) +
  labs(x = "Site", y = "CWM", title="Control plots 2012") +
