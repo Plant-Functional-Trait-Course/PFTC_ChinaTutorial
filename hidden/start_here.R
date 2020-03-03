@@ -7,13 +7,8 @@ library("DBI")
 
 fl <- list.files("community/R/", full.names = TRUE)
 sapply(fl, source)
-path <- "community/"
 
 ## ---- load_community
-
-if(!exists("path")) {
-  path <- ""
-}
 
 # make database connection
 #
@@ -22,10 +17,10 @@ con <- src_sqlite(path = paste0(path, "/data/transplant.sqlite"), create = FALSE
 #load cover data and metadata
 cover_thin <- load_comm(con = con)
 
-# make fat table
+# make wide table
 cover <- cover_thin %>% 
   select(-speciesName) %>%
-  spread(key = species, value = cover, fill = 0)
+  pivot_wider(names_from = species, values_from = cover, values_fill = list(cover = 0))
 
 # make meta data
 cover_meta <- cover[, 1:which(names(cover) == "year")]
