@@ -29,13 +29,17 @@ library("patchwork")
 ```
 
 ```{r Read cover and composition data, include=FALSE}
+#check data are downloaded
+if(!fs::file_exists("traits/data/PFTC1.2_China_2015_2016_ChemicalTraits.csv")){
+  stop("Need to download data first - see 1_RtutorialChina.Rmd")
+}
 source("hidden/start_here.R")
 ```
 
 ```{r Read trait data, include=FALSE}
-traitsLeaf <- read_csv(file = "traits/data/PFTC1.2_China_2015_2016_LeafTraits.csv", col_names = TRUE)
+traitsLeaf <- read_csv(file = "traits/data/PFTC1.2_China_2015_2016_LeafTraits.csv")
 
-traitsChem <- read_csv(file = "traits/data/PFTC1.2_China_2015_2016_ChemicalTraits.csv", col_names = TRUE)
+traitsChem <- read_csv(file = "traits/data/PFTC1.2_China_2015_2016_ChemicalTraits.csv")
 ```
                                                                           
 # TRANSPLANT EXPERIMENT GONGGA MOUNTAIN (CHINA)
@@ -44,15 +48,15 @@ traitsChem <- read_csv(file = "traits/data/PFTC1.2_China_2015_2016_ChemicalTrait
 
 ### Cover and composition data
 
-cover_thin is an object that contains community data (cover data and composition of each turb and treatment). 
+`cover_thin` is an object that contains community data (cover data and composition of each turf and treatment). 
 
-Explore the columns names in cover_thin, "head" is more informative. Use whatever you prefer:
+Explore the columns names in `cover_thin`, `head()` is more informative. Use whatever you prefer:
 ```{r Exploring how the data are organized, eval=FALSE}
 colnames(cover_thin)
 head(cover_thin)
 ```
 
-cover is a summary of the total cover of each species in cover_thin
+cover is a summary of the total cover of each species in `cover_thin`
 
 Explore the columns names in cover:
 ```{r Exploring how the data are organized2, eval = FALSE}
@@ -80,7 +84,7 @@ Check treatments:
 levels(cover_thin$TTtreat) 
 ```
 
-Exploring the levels of each factor, allows to get an idea of the experimental setup. For example, number of sites, blocks per site, Treatments names, and how are the variables stored in cover_thin. Just to remember, there are four study sites that contains an in situ warming experiments using OTCs and reciprocal community transplantation experiments (i.e., warming and cooling) between all pairs of neighbouring sites along the gradient. There are seven blocks at each site. Within each of the seven blocks at each site, plots were randomly designated to SIX different experimental treatments. You can get a better idea reading the README file of the China data.
+Exploring the levels of each factor, allows to get an idea of the experimental setup. For example, number of sites, blocks per site, Treatments names, and how are the variables stored in cover_thin. Just to remember, there are four study sites that contains an in situ warming experiments using OTCs and reciprocal community transplantation experiments (i.e., warming and cooling) between all pairs of neighbouring sites along the gradient. There are seven blocks at each site. Within each of the seven blocks at each site, plots were randomly designated to SIX different experimental treatments. You can get a better idea reading the [README file](https://github.com/richardjtelford/transplant/blob/master/ReadMe.md) of the China data.
 
 ### Trait data
 
@@ -111,12 +115,20 @@ In the cover data, there are 7 levels: "control" "local"   "warm1"   "cool1"   "
 Let´s rename the levels of Treatment:
 ```{r Rename the treatment levels, eval=TRUE}
 traitsLeaf <- traitsLeaf %>%
-  mutate(Treatment=dplyr::recode(Treatment, "C"= "control", "0"="local", "1" ="warm1", "2"="cool1", "3"="warm3", "4"="cool3", "LOCAL"="outexp", "OTC"="OTC"))%>%
-mutate(Treatment = factor(Treatment, levels = c("local", "control", "warm1", "cool1", "warm3", "cool3","OTC", "outexp")))
+  mutate(Treatment = recode(Treatment, 
+                            "C" =  "control", "0" = "local", "1" = "warm1", 
+                            "2" = "cool1", "3" = "warm3", "4" = "cool3", 
+                            "LOCAL" = "outexp", "OTC" = "OTC")) %>%
+mutate(Treatment = factor(Treatment, 
+                          levels = c("local", "control", "warm1", "cool1", "warm3", "cool3", "OTC", "outexp")))
 
 traitsChem <- traitsChem %>%
-  mutate(Treatment=dplyr::recode(Treatment,"C"= "control","0"="local", "1" ="warm1", "2"="cool1", "3"="warm3", "4"="cool3", "LOCAL"="outexp", "OTC"="OTC")) %>%
-mutate(Treatment = factor(Treatment, levels = c("local", "control", "warm1", "cool1", "warm3", "cool3", "OTC", "outexp")))
+  mutate(Treatment = recode(Treatment,
+                            "C" = "control","0" = "local", "1" = "warm1", 
+                            "2" = "cool1", "3" = "warm3", "4" = "cool3",
+                            "LOCAL" = "outexp", "OTC" = "OTC")) %>%
+mutate(Treatment = factor(Treatment, 
+                          levels = c("local", "control", "warm1", "cool1", "warm3", "cool3", "OTC", "outexp")))
 ```
 
 Check the levels now:

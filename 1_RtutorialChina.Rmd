@@ -37,24 +37,10 @@ knitr::include_graphics('./map/ChinaMountain.jpg')
 
 ## 1. Install packages
 
-First, is important to install all packages needed (1), and check that indeed they are installed (2), call these libraries (3) and download the data to the correct folders.
+First, is important to install all packages needed. The code in the file "setup.R" will do this and check you have a recent version of R.
 
-Here are all the steps to follow. The .R files are scripts with the codes. Open the files if you want to see the instructions (highly recommended).
-
-```{r Install packages, eval=FALSE}
-source("install_packages.R")
-```
-
-## 2. Check out that everything is updated 
- 
-Check R version and libraries
- 
-```{r Check out that everything is updated, eval=FALSE}
-source("setup.R")
-```
-
-## 3. Call the libraries
-```{r Call the libraries, eval=TRUE}
+## 2. Load the packages
+```{r load_packages, eval=TRUE}
 library("tidyverse")
 library("dataDownloader")
 library("DBI")
@@ -63,25 +49,18 @@ library("ggvegan")
 library("patchwork")
 ```
 
-## 4. Download the data
+## 3. Download the data
 
 Download the data and store it in the proper files
 
 ```{r Download the data, eval=TRUE}
 # Instructions to download the Data
-# load packages
-library("osfr")
-library("dataDownloader")
 # Location of PFTC Data
 # The data are located in OSF repository
 # To know the exact location of each PFTC Data check this file:
 # https://docs.google.com/spreadsheets/d/1y81Xv33BaoWV2FNx0F9XbikjKeHLGNxfmWZ2w4xmISk/edit#gid=0
 
 ## COMMUNITY DATA
-path <- "community/"
-if(!exists("path")) {
-  path <- ""
-}
 
 # China community data from the transplants:
 get_file(node = "4hjzu",
@@ -89,21 +68,18 @@ get_file(node = "4hjzu",
          path = "community/data")
 
 ## TRAIT DATA
-path <- "traits/"
-if(!exists("path")) {
-  path <- ""
-}
 # China traits: Leaf traits
 get_file(node = "emzgf",
          file = "PFTC1.2_China_2015_2016_LeafTraits.csv",
          path = "traits/data")
+
 # China traits: Chemical traits
 get_file(node = "emzgf",
          file = "PFTC1.2_China_2015_2016_ChemicalTraits.csv",
          path = "traits/data")
 ```
 
-## 5. Read the data
+## 4. Read the data
 
 ### Cover and composition data
 
@@ -117,7 +93,7 @@ This script is going to:
   
 1. Read the data from the transplants (transplant.sqlite)
 2. Load cover data and metadata (cover_thin)
-3. Make a fat table (cover) with species names in columns and cover values in each plot
+3. Make a wide table (cover) with species names in columns and cover values in each plot
 4. Make meta data (cover_meta) This are the meta data of the "cover" tibble
 
 We can either source it or run it step by step to see what is doing (preferred option). If you want to run it step by step then open the file.
@@ -127,9 +103,9 @@ We can either source it or run it step by step to see what is doing (preferred o
 The traits data are located in China/traits/data, in two files: LeafTraits and ChemicalTraits. 
                                                             To read the csv files:
 ```{r Trait data, eval=TRUE}
-traitsLeaf <- read_csv(file = "traits/data/PFTC1.2_China_2015_2016_LeafTraits.csv", col_names = TRUE)
+traitsLeaf <- read_csv(file = "traits/data/PFTC1.2_China_2015_2016_LeafTraits.csv")
 
-traitsChem <- read_csv(file = "traits/data/PFTC1.2_China_2015_2016_ChemicalTraits.csv", col_names = TRUE)
+traitsChem <- read_csv(file = "traits/data/PFTC1.2_China_2015_2016_ChemicalTraits.csv")
 ```
                                                                                                                  
                 

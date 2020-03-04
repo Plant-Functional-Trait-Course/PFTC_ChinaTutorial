@@ -29,22 +29,21 @@ source("hidden/starter.R")
 ####  Data wrangling
 
 Here is the code for plotting the traits distributions. 
-Before ploting the trait ditributions, we need to make some changes to the datasets and log transform the variables, to finally merge the two trait data sets into a single one.
+Before plotting the trait distributions, we need to make some changes to the datasets and log transform the variables, to finally merge the two trait data sets into a single one.
 
 First, you can see that Site is stored as "character". 
 ```{r Data wrangling, eval=TRUE}
 mode(traitsLeaf$Site)
 ```
 
-Step 1: For plotting purpuses is better to transform this variable to a factor, with four levels ("L", "M", "A", "H"). We will also log transform the traits, this will help to reduce the skewness of the values and to make the relationships between traits clearer.
+Step 1:  We will log transform the traits, this will help to reduce the skewness of the values and to make the relationships between traits clearer.
 
 ```{r Data wrangling2, eval=TRUE}
 traitsWideL <- traitsLeaf %>% 
   mutate(Wet_Mass_g.log = log(Wet_Mass_g),
          Dry_Mass_g.log = log(Dry_Mass_g),
          Leaf_Thickness_Ave_mm.log = log(Leaf_Thickness_Ave_mm),
-         Leaf_Area_cm2.log = log(Leaf_Area_cm2)) %>% 
-  mutate(Site = factor(Site, levels = c("L", "M", "A", "H"))) 
+         Leaf_Area_cm2.log = log(Leaf_Area_cm2)) 
 ```
 
 Step 2: New format to the leaf traits data, with traits and values in two columns: 
@@ -52,7 +51,8 @@ Step 2: New format to the leaf traits data, with traits and values in two column
 ```{r Data wrangling3, eval=TRUE}
 traitsLongL <- traitsWideL %>% 
   select(Date, Elevation, Site, Treatment, Taxon, Individual_number, Leaf_number, Wet_Mass_g.log, Dry_Mass_g.log, Leaf_Thickness_Ave_mm.log, Leaf_Area_cm2.log, SLA_cm2_g, LDMC) %>% 
-  pivot_longer(cols=c("Wet_Mass_g.log", "Dry_Mass_g.log", "Leaf_Thickness_Ave_mm.log", "Leaf_Area_cm2.log", "SLA_cm2_g", "LDMC"), names_to="Traits", values_to = "Value")
+  pivot_longer(cols = c("Wet_Mass_g.log", "Dry_Mass_g.log", "Leaf_Thickness_Ave_mm.log", "Leaf_Area_cm2.log", "SLA_cm2_g", "LDMC"), 
+               names_to = "Traits", values_to = "Value")
 ```
 
 Step 3: New format to the leaf Chemical traits (same manner). These values are percentage, so we don´t need to log transform these traits:
@@ -60,46 +60,44 @@ Step 3: New format to the leaf Chemical traits (same manner). These values are p
 ```{r Data wrangling4, eval=TRUE}
 traitsLongC <- traitsChem %>% 
   select(Date, Elevation, Site, Treatment, Taxon, P_percent, C_percent, N_percent, CN_ratio, dN15_percent, dC13_percent) %>% 
-  pivot_longer(cols=c("P_percent", "C_percent","N_percent", "CN_ratio", "dN15_percent", "dC13_percent"), names_to="Traits", values_to = "Value")
+  pivot_longer(cols = c("P_percent", "C_percent","N_percent", "CN_ratio", "dN15_percent", "dC13_percent"), 
+               names_to = "Traits", values_to = "Value")
 ```
 
-Step 4: Bind the two data sets (Leaf and Chemical traits), using the two "long" tables:
+Step 4: Bind the two data sets (Leaf and Chemical traits), using the two "long" tables, and transform the Site variable variable to a factor, with four levels ("Lowland", "Middle", "Alpine", "High alpine").
 
 ```{r Data wrangling5, eval=TRUE}
-traitsLong <- traitsLongL %>% bind_rows(traitsLongC)
-```
-
-Make the Site a factor instead of a character, and order the levels from L to H (upslope)
-```{r Data wrangling6, eval=TRUE}
-traitsLong <- traitsLong %>% 
-  mutate(Site = factor(Site, levels = c("L", "M", "A", "H"))) 
+traitsLong <- traitsLongL %>% 
+  bind_rows(traitsLongC) %>% 
+  mutate(Site = factor(Site, levels = c("L", "M", "A", "H"), labels = c("Lowland", "Middle", "Alpine", "High alpine")))
 ```
 
 A short note:
 
-Reasons for mutating character names into a factor (or why sometimes is better to use factor instead of character in R): This is not 100% neccesary and you can load the upcomming codes without mutating the Traits names into a factor, so no worries too much about this lines. But here is the explanation. In case you are working with categorical data (predifined, finite number of values) is generally better to use factors instead of character. Although factors look like as character vectors they are integers in their "heart". They are stored in alphabetical order or we can define a meaningfull order (as we did with Site or will do with the Traits names). When defined in a particular order you are forcing the order of facets, or the order of labels, etc... in plots. Compared to simple integers (1,2,3,4), factors are "self-describing" ("L","M","A","H").
+Reasons for mutating character names into a factor (or why sometimes is better to use factor instead of character in R): This is not 100% necessary and you can load the upcoming codes without mutating the Traits names into a factor, so no worries too much about this lines. But here is the explanation. In case you are working with categorical data (predefined, finite number of values) is generally better to use factors instead of character. Although factors look like as character vectors they are integers in their "heart". They are stored in alphabetical order or we can define a meaningful order (as we did with Site or will do with the Traits names). When defined in a particular order you are forcing the order of facets, or the order of labels, etc... in plots. Compared to simple integers (1,2,3,4), factors are "self-describing".
 
 #### Density plot
 
 Here is the code to plot the traits distributions, using density plots. A density plot is similar to an histogram, and allows visualizing the distribution of a numerical variable (it shows the interval and the peaks of the distribution). The peaks of a density plot show where the values are concentrated over the interval.
 
-We want to plot the distribution of each invidual trait, at each site, to visualize their variation. So, first we filter the values containing NA´s, since we are not interested in that and transform the Traits names into a factor (they are stored as character). Then, we plot it using ggplot. The values of each trait are going to appear in the x coordinate (Value) and their frequency in coordinate y. Density curves appear on different colors based on the Site (fill=Site).
+We want to plot the distribution of each individual trait, at each site, to visualize their variation. So, first we `filter` the values containing NA´s, since we are not interested in that and transform the Traits names into a factor (they are stored as character). Then, we plot it using `ggplot`. The values of each trait are going to appear in the x coordinate (Value) and their frequency in coordinate y. Density curves appear on different colours based on the Site (`fill = Site`).
 
-`geom_density(alpha = 0.5)´ argument simply fills the density curves with a transparent color.
+`geom_density(alpha = 0.5)´ argument simply fills the density curves with a transparent colour.
 
-`facet_wrap´ argument allows spliting the plot into the different Traits
+`facet_wrap´ argument allows splitting the plot into the different Traits
 
 ```{r Density plot, eval=TRUE}
-TraitDist <- traitsLong %>% 
+traitsLong <- traitsLong %>% 
   filter(!is.na(Value)) %>% 
-  mutate(Traits = factor(Traits, levels = c("Wet_Mass_g.log", "Dry_Mass_g.log", "Leaf_Thickness_Ave_mm.log", "Leaf_Area_cm2.log", "SLA_cm2_g", "LDMC", "P_percent", "C_percent", "N_percent", "CN_ratio", "dN15_percent", "dC13_percent"))) # if you don´t understand why we are mutating Traits into a factor, you can just remove the last part of this code. It won´t make a huge difference.
+  mutate(Traits = factor(Traits, 
+                         levels = c("Wet_Mass_g.log", "Dry_Mass_g.log", "Leaf_Thickness_Ave_mm.log", "Leaf_Area_cm2.log", "SLA_cm2_g", "LDMC", "P_percent", "C_percent", "N_percent", "CN_ratio", "dN15_percent", "dC13_percent")))
   
-TraitDist.plot <- ggplot(TraitDist, aes(x = Value, fill = Site)) +
+TraitDist.plot <- ggplot(traitsLong, aes(x = Value, fill = Site)) +
   geom_density(alpha = 0.5) +
-  scale_fill_brewer(palette = "RdBu", direction = -1, labels=c("High alpine", "Alpine", "Middle", "Lowland")) +
+  scale_fill_brewer(palette = "RdBu") +
   labs(x = "Mean trait value", y = "Density") +
   facet_wrap( ~ Traits, scales = "free") +
-  theme(legend.position="top")
+  theme(legend.position = "top")
 
 TraitDist.plot
 ```
@@ -110,14 +108,14 @@ Try to plot the same density plot, but using only the values of one of the treat
 
 #### Boxplots
 
-A different way of displaying the distribution of the data is using boxplots. Boxplots are a graph showing how the values are spread out, similarly to the density plots. Sometimes boxplots are more informative that other measures of central tendencies like the mean. We are using here the object TraitDist, defined before.
+A different way of displaying the distribution of the data is using boxplots. Boxplots are a graph showing how the values are spread out, similarly to the density plots. Sometimes boxplots are more informative that other measures of central tendencies like the mean. We are using here the object `TraitDist`, defined before.
 
 ```{r Boxplots, eval=TRUE}
-TraitBoxp.plot <- ggplot(TraitDist, aes(x=Site, y = Value, fill = Site)) +
+TraitBoxp.plot <- ggplot(traitsLong, aes(x = Site, y = Value, fill = Site)) +
  geom_boxplot() +
- scale_fill_brewer(palette = "RdBu", direction = -1, labels=c("High alpine", "Alpine", "Middle", "Lowland")) +
+ scale_fill_brewer(palette = "RdBu") +
   facet_wrap( ~ Traits, scales = "free") +
-  theme(legend.position="top")
+  theme(legend.position = "top")
 
 TraitBoxp.plot
 ```
@@ -132,60 +130,60 @@ For saving the plots:
 
 ####  Data wrangling
 
-This are just some scatterplots relating 2 traits values. Each dot is an observation, and each coordinate represent the value of each of the traits. Fitting traits again each other is very usefull to detect outliers and weird relationships that could indicate an error or outliers in the dataset.
+This are just some scatterplots relating 2 traits values. Each dot is an observation, and each coordinate represent the value of each of the traits. Fitting traits again each other is very useful to detect outliers and weird relationships that could indicate an error or outliers in the dataset.
 
-Some expamples of scatterplots:
+Some examples of scatterplots:
 ```{r Traits scatterplots, eval=TRUE}
 DryWet <- traitsWideL %>% 
   ggplot(aes(x = Dry_Mass_g.log, y = Wet_Mass_g.log, colour = Site)) +
   geom_point(alpha = 0.4) +
-  scale_color_brewer(palette = "RdBu", direction = -1, labels=c("High alpine", "Alpine", "Middle", "Lowland")) +
+  scale_color_brewer(palette = "RdBu", direction = -1, labels = c("High alpine", "Alpine", "Middle", "Lowland")) +
   theme(legend.position = "right")
 ```
 
+If we want to plot different variables, we can just change the aesthetics rather that rewriting the entire plotting code. 
 ```{r Traits scatterplots2, eval=TRUE}
 DryArea <- DryWet + aes(x = Dry_Mass_g.log, y = Leaf_Area_cm2.log) 
 AreaSLA <- DryWet + aes(x = Leaf_Area_cm2, y = SLA_cm2_g)
 LDMCThick <- DryWet + aes(x = LDMC, y = Leaf_Thickness_Ave_mm) 
 ```
 
-We are going to plot all the scatterplots together using the "patchwork" package.
+We are going to plot all the scatterplots together using the `patchwork` package.
 ```{r Traits scatterplots3, eval=TRUE}
 DryWet + DryArea + AreaSLA + LDMCThick + plot_layout(guides = "collect") 
 ```
 
 ### Traits means
 
-We want to plot the mean values and standard error of each invidual trait, at each site, and for each treatment separately. In the plots that we did before we did not differenciate between treatments, but now we do. We are going to use again "traitsLong" object
+We want to plot the mean values and standard error of each individual trait, at each site, and for each treatment separately. In the plots that we did before we did not differentiate between treatments, but now we do. We are going to use again `traitsLong` object.
 
 #### Plot of the means per trait
 
 Plotting the mean values and standard errors for each trait, per site and treatment.
 
-Step 1: Summarize the data from traitsLong. The next code, will make a summary table with the mean values, stardard deviation and stardard errors, grouping the column Value, by Trait, Treatment and Site.
+Step 1: Summarize the data from `traitsLong`. The next code, will make a summary table with the mean values, standard deviation and standard errors, grouping the column Value, by Trait, Treatment and Site.
 
 I have excluded the values of "outexp" (data from outside the experimental turfs)
 
 ```{r Plot of the means per trait2, eval=TRUE}
 TraitsSE <- traitsLong %>% 
   filter(!is.na(Value)) %>%
-  filter(Treatment!= "outexp") %>%
+  filter(Treatment != "outexp") %>%
   group_by(Site, Treatment, Traits) %>%
   summarize(N = length(Value), mean = mean(Value), sd = sd(Value), se = sd / sqrt(N))
 ```
 
-Step 2: Make the plot. Define first the position_dodge, this argument allow you to move horizontaly the errors bars, so they don´t overlap. Exercise: see what happens if you don´t define the position_dodge, or try to change the value.
+Step 2: Make the plot. Define first the `position_dodge`, this argument allow you to move horizontally the errors bars, so they don´t overlap. Exercise: see what happens if you don´t define the `position_dodge`, or try to change the value.
 
 ```{r Plot of the means per trait3, eval=TRUE}
 pd <- position_dodge(0.4)
 
-TraitsSE.p <- ggplot(TraitsSE, aes(x = Site, y=mean,  colour=Treatment)) +
-  geom_errorbar(aes(ymin=mean-se, ymax=mean+se), width=.1, position=pd) +
-  geom_line(position=pd) +
-  geom_point(position=pd)+
+TraitsSE.p <- ggplot(TraitsSE, aes(x = Site, y = mean,  colour = Treatment)) +
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = 0.1, position = pd) +
+  geom_point(position = pd) +
   labs(x = "Site", y = "Mean/se trait value") +
   facet_wrap( ~ Traits, scales = "free") +
-  theme(legend.position="top")
+  theme(legend.position = "top")
 
 TraitsSE.p 
 ```
@@ -201,7 +199,7 @@ Calculation of community weighted means. An 'easy' (and not very meaningful) exa
 
 #### Data wrangling
 
-For the traits calculations we are going to use traitsLong, you can check how we built this data frame in the previous codes. Now, just select the variables Site, Treatment, Taxon, Traits and Value to manage a smaller set of data.
+For the traits calculations we are going to use `traitsLong`, you can check how we built this data frame in the previous codes. Now, just select the variables Site, Treatment, Taxon, Traits and Value to manage a smaller set of data.
 
 ```{r}
 traitsLong <- traitsLong %>%
@@ -216,8 +214,7 @@ And calculate the mean trait values for each taxon per site. Trait values can be
 traits.meanvalues <- traitsLong %>% 
   filter(!is.na(Value)) %>%
   group_by(Site, Traits, Taxon) %>%
-  summarise(mean = mean(Value)) %>%
-  spread(key = Traits, value = mean)
+  summarise(mean = mean(Value))
 ```
 
 ##### Calculate the weights
@@ -227,9 +224,10 @@ Subset the cover data, by year and treatment, to include only 2012 and Control p
 ```{r}
 cover_2012C <- cover_thin %>%
   filter(year == "2012") %>% # subset the year
-  filter(TTtreat =="control") %>% # subset the control
+  filter(TTtreat == "control") %>% # subset the control
   select(originSiteID, originPlotID, turfID, TTtreat, year, cover, speciesName) %>%
-  mutate(originSiteID = factor(originSiteID, levels = c("L", "M", "A", "H"))) # select only a few variables (we dont need everything)
+  mutate(originSiteID = factor(originSiteID, levels = c("L", "M", "A", "H"),
+                               labels = c("Lowland", "Middle", "Alpine", "High alpine"))) # select only a few variables (we dont need everything)
 ```
 
 Now, calculate the species weights based on mean cover of each species at each site in 2012 in the Control plots. Just a mean of the cover per site for each species!
@@ -240,25 +238,23 @@ spp.wts2012C <- cover_2012C %>%
   summarise(wts = mean(cover)) 
 ```
 
-Now, we need to merge the species weights with their mean trait values in a single data frame, and we are going to use the column "Taxon" to conect both data frame. But, the two data frames have different column names for the species names as you will see here:
+Now, we need to merge the species weights with their mean trait values in a single data frame, and we are going to use the column "Taxon" to connect both data frames. But, the two data frames have different column names for the species names as you will see here:
 
 ```{r}
 names(spp.wts2012C) # names of the columns or variables
 names(traits.meanvalues) # names of the columns or variables 
 ```
 
-So, first we are going to change the second column name in ssp.wts2012C and call it "Taxon", and after that we can join the two tables.
+So, first we are going to change the second column name in `ssp.wts2012C` and call it "Taxon", and after that we can join the two tables.
 
 ```{r}
 spp.wts2012C <- spp.wts2012C %>%
-  rename(Taxon=speciesName,Site=originSiteID)
+  rename(Taxon = speciesName, Site = originSiteID)
 
-# and then merge:
-traits.wts <- inner_join(x=spp.wts2012C, y=traits.meanvalues, by=c("Taxon", "Site")) %>%
+# and then join:
+traits.wts <- inner_join(x = spp.wts2012C, y = traits.meanvalues, 
+                         by = c("Taxon", "Site")) %>%
     arrange(Site) 
-
-traits.wtsL <- traits.wts %>% 
-pivot_longer(cols = c("C_percent", "CN_ratio","dC13_percent","dN15_percent", "Dry_Mass_g.log", "LDMC", "Leaf_Area_cm2.log", "Leaf_Thickness_Ave_mm.log", "N_percent", "P_percent", "SLA_cm2_g", "Wet_Mass_g.log"), names_to = "traits", values_to = "value")
 ```
 
 
@@ -267,24 +263,19 @@ There we go:
 Step 1: Summarize the CWM for each trait (but now we also group by year for calculating)
 
 ```{r}
-cwm <- traits.wtsL %>% 
-group_by(Site, traits) %>% 
-  summarise(wm = weighted.mean(value, wts, na.rm=TRUE))
+cwm <- traits.wts %>% 
+  group_by(Site, Traits) %>% 
+  summarise(wm = weighted.mean(mean, wts, na.rm = TRUE))
 ```
 
 Step 2: Plot
 
 ```{r}
-pd <- position_dodge(0.4)
-
-cwm.p <- cwm %>% 
- mutate(traits = factor(traits, levels = c("Wet_Mass_g.log", "Dry_Mass_g.log", "Leaf_Thickness_Ave_mm.log", "Leaf_Area_cm2.log", "SLA_cm2_g", "LDMC", "P_percent", "C_percent", "N_percent", "CN_ratio", "dN15_percent", "dC13_percent"))) 
-  
-cwm.p <- ggplot(cwm.p, aes(x = Site, y= wm)) +
- geom_point(position=pd, shape=17) +
- labs(x = "Site", y = "CWM", title="Control plots 2012") +
- facet_wrap( ~ traits, scales = "free") +
- theme(legend.position="top", plot.title = element_text(size = (15))) 
+cwm.p <- ggplot(cwm, aes(x = Site, y = wm)) +
+ geom_point(shape = 17) +
+ labs(x = "Site", y = "CWM", title = "Control plots 2012") +
+ facet_wrap( ~ Traits, scales = "free") +
+ theme(legend.position = "top", plot.title = element_text(size = (15))) 
 
 cwm.p
 ```

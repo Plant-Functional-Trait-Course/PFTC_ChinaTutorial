@@ -8,7 +8,7 @@ library("ggvegan")
 library("patchwork")
 
 ## Download the data
-#source("instructions_to_download.R")
+
 
 # Read cover and composition data
 source("hidden/start_here.R")
